@@ -39,6 +39,9 @@
 - Postgres
 - MongoDB (Для хранения маршрутов, пока не знаю какой формат нужен и какие нюансы могут быть, поэтому mongo)
 
+### Структура БД
+
+![DB Structure](docs/images/db-structure.drawio.png)
 
 ## Запуск проекта:
 - ...
