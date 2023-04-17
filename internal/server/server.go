@@ -33,6 +33,7 @@ func (s *Server) Run() error {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	// TODO: добавить проверку авторизацию
 
 	// handlers
 	authHandler, err := auth.NewHandler()
