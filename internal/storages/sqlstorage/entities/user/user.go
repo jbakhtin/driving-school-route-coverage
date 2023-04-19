@@ -54,7 +54,7 @@ func (s* Storage) Create(user models.User) (*models.User, error){
 	return &stored, nil
 }
 
-func (s* Storage) GetById(id int) (*models.User, error){
+func (s* Storage) GetByID(id int) (*models.User, error){
 	var user models.User
 	err := s.QueryRow(getByID, id).
 		Scan(&user.Id,
