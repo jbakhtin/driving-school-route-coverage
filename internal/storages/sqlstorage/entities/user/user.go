@@ -38,7 +38,7 @@ func (s* Storage) Create(user models.User) (*models.User, error){
 
 	var stored models.User
 	err := s.QueryRow(create, &user.Name, &user.Lastname, &user.Login, &user.Email, &user.Password, createdAt).
-		Scan(&stored.Id,
+		Scan(&stored.ID,
 			&stored.Name,
 			&stored.Lastname,
 			&stored.Login,
@@ -57,7 +57,7 @@ func (s* Storage) Create(user models.User) (*models.User, error){
 func (s* Storage) GetByID(id int) (*models.User, error){
 	var user models.User
 	err := s.QueryRow(getByID, id).
-		Scan(&user.Id,
+		Scan(&user.ID,
 			&user.Name,
 			&user.Lastname,
 			&user.Login,
