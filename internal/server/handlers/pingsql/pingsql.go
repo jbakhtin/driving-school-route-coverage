@@ -1,4 +1,4 @@
-package auth
+package pingsql
 
 import (
 	"github.com/jbakhtin/driving-school-route-coverage/internal/config"
@@ -31,23 +31,14 @@ func NewHandler(cfg config.Config) (*Handler, error) {
 	}, nil
 }
 
-func (h *Handler) Register() http.HandlerFunc {
+func (h *Handler) PingSQL() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-	}
-}
+		err := h.storage.Ping()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-func (h *Handler) LogIn() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-	}
-}
-
-func (h *Handler) LogOut() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 	}
 }
