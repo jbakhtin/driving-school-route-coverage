@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/config"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/server"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"go.uber.org/zap"
 	"os/signal"
 	"syscall"
@@ -23,7 +23,7 @@ func main() {
 		logger.Error(err.Error())
 	}
 
-	myServer, err := server.New(cfg)
+	myServer, err := application.New(cfg)
 	if err != nil {
 		logger.Error(err.Error())
 		return
