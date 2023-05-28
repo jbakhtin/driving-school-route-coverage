@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"bytes"
@@ -8,17 +8,7 @@ import (
 	"net/http"
 )
 
-type ErrorResponse struct {
-	Errors map[string]string `json:"errors,omitempty"`
-}
-
-func NewErrorResponse() *ErrorResponse {
-	return &ErrorResponse{
-		Errors: make(map[string]string),
-	}
-}
-
-func ValidateRegisterRequest(next http.Handler) http.Handler {
+func ValidateRegistrationParams(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		req := r.Clone(r.Context())
@@ -44,6 +34,11 @@ func ValidateRegisterRequest(next http.Handler) http.Handler {
 		if request.Email == "" {
 			w.WriteHeader(http.StatusBadRequest)
 			response.Errors["email"] = "Email parameter is required"
+		}
+
+		if request.Login == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			response.Errors["login"] = "Login parameter is required"
 		}
 
 		if request.Password == "" {

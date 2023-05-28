@@ -55,6 +55,25 @@ func (ur *UserRepository) GetUserById(id int) (*models.User, error) {
 	return &user, nil
 }
 
+func (ur *UserRepository) GetUserByLogin(login string) (*models.User, error) {
+	var user models.User
+	err := ur.QueryRow(query.GetUserByLogin, login).
+		Scan(&user.ID,
+			&user.Name,
+			&user.Lastname,
+			&user.Login,
+			&user.Email,
+			&user.Password,
+			&user.CreatedAt,
+			&user.UpdatedAt)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 func (ur *UserRepository) GetUsers() ([]models.User, error) {
 	return nil, nil
 }

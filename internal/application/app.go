@@ -8,11 +8,9 @@ import (
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/api/handlers"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/api/middlewares"
+	appMiddleware "github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/api/middleware"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/database/postgres"
 	postgresRepo "github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/database/postgres/repository"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/database/redis"
-	redisRepo "github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/database/redis/repository"
 	"net/http"
 )
 
@@ -35,37 +33,26 @@ func New(cfg config.Config) (*Server, error) {
 func (s *Server) Start(ctx context.Context) error {
 	r := chi.NewRouter()
 
-	// middlewares
+	// middleware
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	client, err := postgres.New(*s.config)
-	repo, err := postgresRepo.NewUserRepository(client)
+	// TODO: объединить компоновщиком
+	postgresClient, err := postgres.New(*s.config)
+	repo, err := postgresRepo.NewUserRepository(postgresClient)
+	userService, err := services.NewAuthService(repo)
 
-	// TODO: создать клиент редиса (Или другой базы данных, но в моем случае редиса)
-	redisClint, err := redis.New(*s.config)
-	// TODO: инициализировать репозиторий сессий с клиентом редиса
-	seession, err := redisRepo.NewSessionRepository(redisClint)
-
-	userService, err := services.NewAuthService(repo, seession) // TODO: передать репозиторий сервис авторизации
-
-	// TODO: создать миделвеер для проверки аутентификации пользваотеля
-	// TODO: передать репозиторий сервис миделвеер
-
+	// TODO: выделить в отдельные списки хендлеров
 	handlersList, err := handlers.New(*s.config, userService)
 
 	r.Route("/", func(r chi.Router) {
-		r.With(middlewares.ValidateRegisterRequest).Post("/register", apperror.Middleware(handlersList.Register))
-		r.Post("/login", apperror.Middleware(handlersList.LogIn))
-
+		r.With(appMiddleware.ValidateRegistrationParams).Post("/register", apperror.Middleware(handlersList.Register))
+		r.With(appMiddleware.ValidateLoginParams).Post("/login", apperror.Middleware(handlersList.LogIn))
 
 		r.Group(func(r chi.Router) {
-			r.Use(middlewares.CheckAuth)
-			// TODO: добавить проверку авторизацию
-
-			r.Post("/logout", handlersList.LogOut())
+			r.Use(appMiddleware.CheckAuth)
 
 			//r.Route("/areas", func(r chi.Router) {
 			//	r.Post("/", handlersList.CreateArea())
@@ -105,10 +92,6 @@ func (s *Server) Start(ctx context.Context) error {
 			//		r.Get("/point", handlersList.GetMarkPoints()) // Получить точку по конкретной марке
 			//	})
 			//})
-		})
-
-		r.Route("/ping/", func(r chi.Router) {
-			//r.Get("/postgres", handlersList.PingSQL())
 		})
 	})
 

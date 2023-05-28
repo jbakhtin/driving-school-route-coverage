@@ -23,6 +23,11 @@ func New(cfg config.Config) (*Postgres, error) {
 		return nil, err
 	}
 
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+
 	return &Postgres{
 		DB:     db,
 		logger: logger,

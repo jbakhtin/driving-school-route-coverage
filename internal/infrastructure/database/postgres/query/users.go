@@ -18,6 +18,11 @@ const (
 		WHERE users.id = $1
 	`
 
+	GetUserByLogin = `
+		SELECT id, name, lastname, login, email, password, created_at, updated_at FROM users
+		WHERE users.login = $1
+	`
+
 	GetUsers = `
 		SELECT id, name, lastname, login, email, created_at, updated_at FROM users
 	`

@@ -1,14 +1,15 @@
 package services
 
 import (
-	"context"
+	"crypto/hmac"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/models"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
 	"go.uber.org/zap"
-	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 // TODO: пусть сервисы имеют общую структуру, а хендлеры нет, так как к хендлеров нет специфических компонентов или интефейсов
@@ -47,11 +48,10 @@ type UserRegistrationResponse struct {
 
 type AuthService struct {
 	logger *zap.Logger
-	userRepo   repositories.UserRepository
-	sessionRepo   repositories.Session
+	repo   repositories.UserRepository
 }
 
-func NewAuthService(userRepo repositories.UserRepository, sessionRepo repositories.Session) (*AuthService, error) {
+func NewAuthService(repo repositories.UserRepository) (*AuthService, error) {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		return nil, err
@@ -59,8 +59,7 @@ func NewAuthService(userRepo repositories.UserRepository, sessionRepo repositori
 
 	return &AuthService{
 		logger: logger,
-		userRepo:   userRepo,
-		sessionRepo:   sessionRepo,
+		repo:   repo,
 	}, nil
 }
 
@@ -73,13 +72,13 @@ func (us *AuthService) RegisterUser(request UserRegistrationRequest) (*models.Us
 		Password: request.Password,
 	}
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-	user.Password = string(hashedPassword)
+	h := hmac.New(sha256.New, []byte("test_app_key"))
+	h.Write([]byte(fmt.Sprintf("%s:%s", user.Login, user.Password)))
+	dst := h.Sum(nil)
 
-	userCreated, err := us.userRepo.CreateUser(user)
+	user.Password = fmt.Sprintf("%x", dst)
+
+	userCreated, err := us.repo.CreateUser(user)
 	if err != nil {
 		return nil, err
 	}
@@ -93,23 +92,30 @@ func (us *AuthService) LoginUser(request UserLoginRequest) (*UserLoginResponse, 
 		Password: request.Password,
 	}
 
-	var response UserLoginResponse
-
-	if userLogin.Login != "login" || userLogin.Password != "password" {
-		return nil, errors.New("login or password not valid")
-	}
-
-	response.Token = "token"
-
-	var seesion models.Session
-	seesion.UserId = 1
-	seesion.SessionId = response.Token
-	seesion.TTL = time.Hour * 24
-
-	err := us.sessionRepo.SetSession(context.TODO(), seesion)
+	// TODO: find user
+	user, err := us.repo.GetUserByLogin(userLogin.Login)
 	if err != nil {
 		return nil, err
 	}
+
+	h := hmac.New(sha256.New, []byte("test_app_key"))
+	h.Write([]byte(fmt.Sprintf("%s:%s", userLogin.Login, userLogin.Password)))
+	hashedPassword := h.Sum(nil)
+
+	if user.Password != fmt.Sprintf("%x", hashedPassword) {
+		return nil, errors.New("password not valid")
+	}
+
+	token := jwt.New(jwt.SigningMethodHS256)
+	// Добавляем информацию о пользователе в токен
+	claims := token.Claims.(jwt.MapClaims)
+	claims["user_id"] = user.ID
+	// Подписываем токен с помощью секретного ключа
+	tokenString, err := token.SignedString([]byte("test"))
+
+	var response UserLoginResponse
+
+	response.Token = tokenString
 
 	return &response, nil
 }
