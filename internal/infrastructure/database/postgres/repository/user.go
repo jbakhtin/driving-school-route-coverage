@@ -36,7 +36,7 @@ func (ur *UserRepository) CreateUser(user repositories.UserRegistration) (*model
 	return &stored, nil
 }
 
-func (ur *UserRepository) GetUserById(id int) (*models.User, error) {
+func (ur *UserRepository) GetUserByID(id int) (*models.User, error) {
 	var user models.User
 	err := ur.QueryRow(query.GetUserByID, id).
 		Scan(&user.ID,

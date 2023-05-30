@@ -11,7 +11,7 @@ type UserRegistration struct {
 }
 
 type UserRepository interface {
-	GetUserById(id int) (*models.User, error)
+	GetUserByID(id int) (*models.User, error)
 	GetUserByLogin(login string) (*models.User, error)
 	GetUsers() ([]models.User, error)
 	CreateUser(user UserRegistration) (*models.User, error)

@@ -123,6 +123,9 @@ func (us *AuthService) LoginUser(request UserLoginRequest) (*UserLoginResponse, 
 	claims["user_id"] = user.ID
 	// Подписываем токен с помощью секретного ключа
 	tokenString, err := token.SignedString([]byte("test"))
+	if err != nil {
+		return nil, err
+	}
 
 	var response UserLoginResponse
 
