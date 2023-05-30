@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/models"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
 	"go.uber.org/zap"
 )
@@ -20,11 +19,11 @@ type UserLoginRequest struct {
 }
 
 type UserLoginResponse struct {
-	Token string
+	Token string `json:"token,omitempty"`
 }
 
-func (e *UserLoginResponse) Marshal() []byte {
-	marshal, err := json.Marshal(e)
+func (ulr *UserLoginResponse) Marshal() []byte {
+	marshal, err := json.Marshal(ulr)
 	if err != nil {
 		return nil
 	}
@@ -42,8 +41,16 @@ type UserRegistrationRequest struct {
 }
 
 type UserRegistrationResponse struct {
-	Message      string
-	RegisteredAt string
+	Message      string `json:"message,omitempty"`
+}
+
+func (e *UserRegistrationResponse) Marshal() []byte {
+	marshal, err := json.Marshal(e)
+	if err != nil {
+		return nil
+	}
+
+	return marshal
 }
 
 type AuthService struct {
@@ -63,7 +70,7 @@ func NewAuthService(repo repositories.UserRepository) (*AuthService, error) {
 	}, nil
 }
 
-func (us *AuthService) RegisterUser(request UserRegistrationRequest) (*models.User, error) {
+func (us *AuthService) RegisterUser(request UserRegistrationRequest) (*UserRegistrationResponse, error) {
 	user := repositories.UserRegistration{
 		Name:     request.Name,
 		Lastname: request.Lastname,
@@ -78,12 +85,16 @@ func (us *AuthService) RegisterUser(request UserRegistrationRequest) (*models.Us
 
 	user.Password = fmt.Sprintf("%x", dst)
 
-	userCreated, err := us.repo.CreateUser(user)
+	_, err := us.repo.CreateUser(user)
 	if err != nil {
 		return nil, err
 	}
 
-	return userCreated, nil
+	response := UserRegistrationResponse{
+		Message: "User created",
+	}
+
+	return &response, nil
 }
 
 func (us *AuthService) LoginUser(request UserLoginRequest) (*UserLoginResponse, error) {

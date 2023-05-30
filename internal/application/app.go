@@ -30,26 +30,33 @@ func New(cfg config.Config) (*Server, error) {
 	}, nil
 }
 
+// notFound возврат 404 ошибки в общем стиле в json формате
+func notFound(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+	return apperror.NotFound
+}
+
 func (s *Server) Start(ctx context.Context) error {
 	r := chi.NewRouter()
 
-	// middleware
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
+	r.NotFound(apperror.Handler(notFound))
+
 	// TODO: объединить компоновщиком
 	postgresClient, err := postgres.New(*s.config)
 	repo, err := postgresRepo.NewUserRepository(postgresClient)
 	userService, err := services.NewAuthService(repo)
-
-	// TODO: выделить в отдельные списки хендлеров
-	handlersList, err := handlers.New(*s.config, userService)
+	handlersList, err := handlers.NewAuth(*s.config, userService)
 
 	r.Route("/", func(r chi.Router) {
-		r.With(appMiddleware.ValidateRegistrationParams).Post("/register", apperror.Middleware(handlersList.Register))
-		r.With(appMiddleware.ValidateLoginParams).Post("/login", apperror.Middleware(handlersList.LogIn))
+
+		// TODO: вынести список роутов в отдельный файл
+		r.With(appMiddleware.ValidateRegistrationParams).Post("/register", apperror.Handler(handlersList.Register))
+		r.With(appMiddleware.ValidateLoginParams).Post("/login", apperror.Handler(handlersList.LogIn))
 
 		r.Group(func(r chi.Router) {
 			r.Use(appMiddleware.CheckAuth)

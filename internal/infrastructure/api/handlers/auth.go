@@ -18,7 +18,7 @@ type AuthHandler struct {
 	config  *config.Config
 }
 
-func New(cfg config.Config, service ifaceservice.AuthService) (*AuthHandler, error) {
+func NewAuth(cfg config.Config, service ifaceservice.AuthService) (*AuthHandler, error) {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func New(cfg config.Config, service ifaceservice.AuthService) (*AuthHandler, err
 }
 
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) error {
-	w.Header().Set("Content-Type", "application/json2")
+	w.Header().Set("Content-Type", "application/json")
 
 	body, _ := io.ReadAll(r.Body)
 	var request services.UserRegistrationRequest
@@ -41,7 +41,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	_, err = h.service.RegisterUser(request)
+	registerResponse, err := h.service.RegisterUser(request)
 	if err != nil {
 		if strings.Contains(err.Error(), "duplicate key value violates") {
 			return apperror.UserAlreadyExists
@@ -50,6 +50,10 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
+	_, err = w.Write(registerResponse.Marshal())
+	if err != nil {
+		return err
+	}
 	w.WriteHeader(http.StatusCreated)
 	return nil
 }
