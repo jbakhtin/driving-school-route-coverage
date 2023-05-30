@@ -48,9 +48,21 @@ func (s *Server) Start(ctx context.Context) error {
 
 	// TODO: объединить компоновщиком
 	postgresClient, err := postgres.New(*s.config)
+	if err != nil {
+		return err
+	}
 	repo, err := postgresRepo.NewUserRepository(postgresClient)
+	if err != nil {
+		return err
+	}
 	userService, err := services.NewAuthService(repo)
+	if err != nil {
+		return err
+	}
 	handlersList, err := handlers.NewAuth(*s.config, userService)
+	if err != nil {
+		return err
+	}
 
 	r.Route("/", func(r chi.Router) {
 
