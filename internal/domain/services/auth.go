@@ -6,12 +6,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
 	"go.uber.org/zap"
 )
-
-// TODO: пусть сервисы имеют общую структуру, а хендлеры нет, так как к хендлеров нет специфических компонентов или интефейсов
 
 type UserLoginRequest struct {
 	Login    string `json:"login,omitempty"`
@@ -41,7 +40,7 @@ type UserRegistrationRequest struct {
 }
 
 type UserRegistrationResponse struct {
-	Message      string `json:"message,omitempty"`
+	Message string `json:"message,omitempty"`
 }
 
 func (e *UserRegistrationResponse) Marshal() []byte {
@@ -118,10 +117,8 @@ func (us *AuthService) LoginUser(request UserLoginRequest) (*UserLoginResponse, 
 	}
 
 	token := jwt.New(jwt.SigningMethodHS256)
-	// Добавляем информацию о пользователе в токен
 	claims := token.Claims.(jwt.MapClaims)
 	claims["user_id"] = user.ID
-	// Подписываем токен с помощью секретного ключа
 	tokenString, err := token.SignedString([]byte("test"))
 	if err != nil {
 		return nil, err

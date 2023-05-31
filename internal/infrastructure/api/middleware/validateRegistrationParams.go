@@ -3,9 +3,10 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
 	"io"
 	"net/http"
+
+	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
 )
 
 func ValidateRegistrationParams(next http.Handler) http.Handler {

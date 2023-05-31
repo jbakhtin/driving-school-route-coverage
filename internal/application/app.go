@@ -2,6 +2,8 @@ package application
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
@@ -11,7 +13,6 @@ import (
 	appMiddleware "github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/api/middleware"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/database/postgres"
 	postgresRepo "github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/database/postgres/repository"
-	"net/http"
 )
 
 type Server struct {

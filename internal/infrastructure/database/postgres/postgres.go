@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"database/sql"
+
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"go.uber.org/zap"
 )

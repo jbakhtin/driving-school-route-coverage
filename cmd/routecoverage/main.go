@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/application"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
-	"go.uber.org/zap"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
+	"go.uber.org/zap"
 )
 
 func main() {

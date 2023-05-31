@@ -3,11 +3,11 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
 	"io"
 	"net/http"
-)
 
+	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
+)
 
 func ValidateLoginParams(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
