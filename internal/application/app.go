@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -56,7 +57,7 @@ func (s *Server) Start(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	userService, err := services.NewAuthService(repo)
+	userService, err := services.NewAuthService(*s.config, repo)
 	if err != nil {
 		return err
 	}
@@ -73,6 +74,10 @@ func (s *Server) Start(ctx context.Context) error {
 
 		r.Group(func(r chi.Router) {
 			r.Use(appMiddleware.CheckAuth)
+
+			r.Get("/test", func(writer http.ResponseWriter, request *http.Request) {
+				fmt.Println("test")
+			})
 
 			//r.Route("/areas", func(r chi.Router) {
 			//	r.Post("/", handlersList.CreateArea())

@@ -19,7 +19,7 @@ func New(cfg config.Config) (*Postgres, error) {
 		return nil, err
 	}
 
-	db, err := sql.Open(cfg.DatabaseDriver, cfg.DatabaseDSN)
+	db, err := sql.Open(cfg.DB.Driver, cfg.DB.DSN)
 	if err != nil {
 		return nil, err
 	}

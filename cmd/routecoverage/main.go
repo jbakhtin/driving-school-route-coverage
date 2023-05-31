@@ -19,12 +19,12 @@ func main() {
 		return
 	}
 
-	cfg, err := config.NewConfigBuilder().WithAllFromEnv().Build()
+	cfg := config.GetConfig()
 	if err != nil {
 		logger.Error(err.Error())
 	}
 
-	myServer, err := application.New(cfg)
+	myServer, err := application.New(*cfg)
 	if err != nil {
 		logger.Error(err.Error())
 		return

@@ -2,18 +2,26 @@ package config
 
 import (
 	"github.com/caarlos0/env/v6"
-)
-
-const (
-	_serverAddress  = "127.0.0.1:8080"
-	_databaseDSN    = ""
-	_databaseDriver = "pgx"
+	"sync"
 )
 
 type Config struct {
 	ServerAddress  string `env:"ADDRESS"`
-	DatabaseDSN    string `env:"DATABASE_DSN"`
-	DatabaseDriver string `env:"DATABASE_DRIVER" envDefault:"pgx"`
+	AppKey  string `env:"APP_KEY"`
+	DB             struct {
+		DSN    string `env:"DATABASE_DSN"`
+		Driver string `env:"DATABASE_DRIVER" envDefault:"pgx"`
+	}
+}
+
+var config Config
+var once sync.Once
+
+func GetConfig() *Config {
+	once.Do(func() {
+		config, _ = NewConfigBuilder().WithAllFromEnv().Build()
+	})
+	return &config
 }
 
 type Builder struct {
@@ -23,11 +31,7 @@ type Builder struct {
 
 func NewConfigBuilder() *Builder {
 	return &Builder{
-		Config{
-			_serverAddress,
-			_databaseDSN,
-			_databaseDriver,
-		},
+		Config{},
 		nil,
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
@@ -54,10 +55,11 @@ func (e *UserRegistrationResponse) Marshal() []byte {
 
 type AuthService struct {
 	logger *zap.Logger
+	config *config.Config
 	repo   repositories.UserRepository
 }
 
-func NewAuthService(repo repositories.UserRepository) (*AuthService, error) {
+func NewAuthService(cfg config.Config, repo repositories.UserRepository) (*AuthService, error) {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		return nil, err
@@ -65,6 +67,7 @@ func NewAuthService(repo repositories.UserRepository) (*AuthService, error) {
 
 	return &AuthService{
 		logger: logger,
+		config: &cfg,
 		repo:   repo,
 	}, nil
 }
@@ -78,7 +81,7 @@ func (us *AuthService) RegisterUser(request UserRegistrationRequest) (*UserRegis
 		Password: request.Password,
 	}
 
-	h := hmac.New(sha256.New, []byte("test_app_key"))
+	h := hmac.New(sha256.New, []byte(us.config.AppKey))
 	h.Write([]byte(fmt.Sprintf("%s:%s", user.Login, user.Password)))
 	dst := h.Sum(nil)
 
@@ -108,7 +111,7 @@ func (us *AuthService) LoginUser(request UserLoginRequest) (*UserLoginResponse, 
 		return nil, err
 	}
 
-	h := hmac.New(sha256.New, []byte("test_app_key"))
+	h := hmac.New(sha256.New, []byte(us.config.AppKey))
 	h.Write([]byte(fmt.Sprintf("%s:%s", userLogin.Login, userLogin.Password)))
 	hashedPassword := h.Sum(nil)
 
@@ -119,7 +122,7 @@ func (us *AuthService) LoginUser(request UserLoginRequest) (*UserLoginResponse, 
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["user_id"] = user.ID
-	tokenString, err := token.SignedString([]byte("test"))
+	tokenString, err := token.SignedString([]byte(us.config.AppKey))
 	if err != nil {
 		return nil, err
 	}
