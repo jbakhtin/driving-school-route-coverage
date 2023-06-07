@@ -57,8 +57,8 @@ func TestAuthHandler_LogIn(t *testing.T) {
 			"User Success Authorized",
 			args{
 				map[string]string{
-					"login": "leperiton11",
-					"password": "zetati16",
+					"login": "test",
+					"password": "test",
 				},
 			},
 			want{
@@ -159,11 +159,14 @@ func TestAuthHandler_LogIn(t *testing.T) {
 			body := strings.NewReader(string(buf))
 
 			req, _ := http.NewRequest("POST", "/login", body)
+			defer req.Body.Close()
 
 			handler.ServeHTTP(rec, req)
 
-			if rec.Result().StatusCode != tt.want.StatusCode {
-				t.Errorf("The status code does not match the expected one. Want %v, received %v.", tt.want.StatusCode, rec.Result().StatusCode)
+			response := rec.Result()
+			defer response.Body.Close()
+			if response.StatusCode != tt.want.StatusCode {
+				t.Errorf("The status code does not match the expected one. Want %v, received %v.", tt.want.StatusCode, response.StatusCode)
 			}
 
 			if rec.Header().Get("Content-Type") != tt.want.ContentType {
@@ -287,8 +290,10 @@ func TestAuthHandler_Register(t *testing.T) {
 
 			handler.ServeHTTP(rec, req)
 
-			if rec.Result().StatusCode != tt.want.StatusCode {
-				t.Errorf("The status code does not match the expected one. Want %v, received %v.", tt.want.StatusCode, rec.Result().StatusCode)
+			response := rec.Result()
+			defer response.Body.Close()
+			if response.StatusCode != tt.want.StatusCode {
+				t.Errorf("The status code does not match the expected one. Want %v, received %v.", tt.want.StatusCode, response.StatusCode)
 			}
 
 			if rec.Header().Get("Content-Type") != tt.want.ContentType {

@@ -74,7 +74,6 @@ func (h *AuthHandler) LogIn() http.HandlerFunc {
 
 		response, err := h.service.LoginUser(request)
 		if err != nil {
-
 			return err
 		}
 
