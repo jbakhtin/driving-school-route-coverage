@@ -4,9 +4,10 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
+	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
@@ -108,6 +109,10 @@ func (us *AuthService) LoginUser(request UserLoginRequest) (*UserLoginResponse, 
 	// TODO: find user
 	user, err := us.repo.GetUserByLogin(userLogin.Login)
 	if err != nil {
+		if strings.Contains(err.Error(), "sql: no rows in result set") {
+			return nil, apperror.UserNotFound
+		}
+
 		return nil, err
 	}
 
@@ -116,7 +121,7 @@ func (us *AuthService) LoginUser(request UserLoginRequest) (*UserLoginResponse, 
 	hashedPassword := h.Sum(nil)
 
 	if user.Password != fmt.Sprintf("%x", hashedPassword) {
-		return nil, errors.New("password not valid")
+		return nil, apperror.New(nil, "Invalid password", apperror.BadRequestParamsCode, "", nil)
 	}
 
 	token := jwt.New(jwt.SigningMethodHS256)

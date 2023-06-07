@@ -2,12 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	authService "github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/api/middleware"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/database/postgres"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/database/postgres/repository"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/interfaces/services"
 	"go.uber.org/zap"
 	"net/http"
 	"net/http/httptest"
@@ -35,6 +34,10 @@ func TestAuthHandler_LogIn(t *testing.T) {
 	}
 
 	authService, err := authService.NewAuthService(*cfg, repo)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 
 	type args struct {
 		RequestParams map[string]string
@@ -42,6 +45,8 @@ func TestAuthHandler_LogIn(t *testing.T) {
 
 	type want struct {
 		StatusCode int
+		ContentType string
+		Body map[string]any
 	}
 	var tests = []struct {
 		name string
@@ -58,6 +63,10 @@ func TestAuthHandler_LogIn(t *testing.T) {
 			},
 			want{
 				200,
+				"application/json",
+				map[string]any{
+					"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo0M30.1-0ZrVKyo27KhzeiKCCItCK4gr2tGXDqjOhsCaQRkFs",
+				},
 			},
 		},
 		{
@@ -70,28 +79,49 @@ func TestAuthHandler_LogIn(t *testing.T) {
 			},
 			want{
 				400,
+				"application/json",
+				map[string]any{
+					"message": "User doesn't exist with this login",
+					"code": "001",
+				},
 			},
 		},
 		{
 			"Parameters not passed",
 			args{
 				map[string]string{
-					"login": "test",
+					"login": "leperiton11",
 				},
 			},
 			want{
 				400,
+				"application/json",
+				map[string]any{
+					"message": "Bad request params",
+					"code": "004",
+					"errors": map[string]string{
+						"password": "Password parameter is required",
+					},
+				},
 			},
 		},
 		{
 			"Parameters not passed",
 			args{
 				map[string]string{
-					"password": "test",
+					"password": "zetati16",
 				},
 			},
 			want{
 				400,
+				"application/json",
+				map[string]any{
+					"message": "Bad request params",
+					"code": "004",
+					"errors": map[string]string{
+						"login": "Login parameter is required",
+					},
+				},
 			},
 		},
 		{
@@ -100,6 +130,15 @@ func TestAuthHandler_LogIn(t *testing.T) {
 			},
 			want{
 				400,
+				"application/json",
+				map[string]any{
+					"message": "Bad request params",
+					"code": "004",
+					"errors": map[string]string{
+						"login": "Login parameter is required",
+						"password": "Password parameter is required",
+					},
+				},
 			},
 		},
 	}
@@ -108,10 +147,11 @@ func TestAuthHandler_LogIn(t *testing.T) {
 		logger:  logger,
 		config:  cfg,
 	}
-	handler := http.HandlerFunc(apperror.Handler(h.LogIn))
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			handler := middleware.ValidateLoginParams(h.LogIn())
+
 			rec := httptest.NewRecorder()
 
 			buf, _ := json.Marshal(tt.args.RequestParams)
@@ -122,7 +162,22 @@ func TestAuthHandler_LogIn(t *testing.T) {
 			handler.ServeHTTP(rec, req)
 
 			if rec.Result().StatusCode != tt.want.StatusCode {
-				t.Errorf("The test is not passed, the test result does not satisfy the expected.")
+				t.Errorf("The status code does not match the expected one. Want %v, received %v.", tt.want.StatusCode, rec.Result().StatusCode)
+			}
+
+			if rec.Header().Get("Content-Type") != tt.want.ContentType {
+				t.Errorf("The content type does not match the expected one. Want %v, received %v.", tt.want.ContentType, rec.Header().Get("Content-Type"))
+			}
+
+			responseMap := make(map[string]any)
+			json.Unmarshal(rec.Body.Bytes(), &responseMap)
+
+			test, _ := json.Marshal(responseMap)
+
+			test2, _ := json.Marshal(tt.want.Body)
+
+			if !reflect.DeepEqual(test, test2) {
+				t.Errorf("The body does not match the expected one. Want %v, received %v.", test2, test)
 			}
 		})
 	}
@@ -147,6 +202,10 @@ func TestAuthHandler_Register(t *testing.T) {
 	}
 
 	authService, err := authService.NewAuthService(*cfg, repo)
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
 
 	type args struct {
 		RequestParams map[string]string
@@ -154,6 +213,8 @@ func TestAuthHandler_Register(t *testing.T) {
 
 	type want struct {
 		StatusCode int
+		ContentType string
+		Body map[string]any
 	}
 
 	h := &AuthHandler{
@@ -161,7 +222,6 @@ func TestAuthHandler_Register(t *testing.T) {
 		logger:  logger,
 		config:  cfg,
 	}
-	handler := http.HandlerFunc(apperror.Handler(h.Register))
 
 	tests := []struct {
 		name    string
@@ -174,19 +234,48 @@ func TestAuthHandler_Register(t *testing.T) {
 				map[string]string{
 					"lastname": "Бахтин",
 					"name": "Юрий",
-					"email": "leperiton11@yandex.ru",
-					"login": "leperiton11",
+					"email": "test_user@yandex.ru",
+					"login": "test_user",
 					"password": "zetati16",
 					"password_confirmation": "zetati16",
 				},
 			},
 			want{
 				200,
+				"application/json",
+				map[string]any{
+					"message": "User created",
+				},
+			},
+		},
+		{
+			"Parameters not passed",
+			args{
+				map[string]string{
+					"lastname": "Бахтин",
+					"name": "Юрий",
+					"email": "leperiton11@yandex.ru",
+					"password": "zetati16",
+					"password_confirmation": "zetati16",
+				},
+			},
+			want{
+				400,
+				"application/json",
+				map[string]any{
+					"message": "Bad request params",
+					"code": "003",
+					"errors": map[string]string{
+						"login": "Login parameter is required",
+					},
+				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			handler := middleware.ValidateRegistrationParams(h.Register())
+
 			rec := httptest.NewRecorder()
 
 			buf, _ := json.Marshal(tt.args.RequestParams)
@@ -197,34 +286,22 @@ func TestAuthHandler_Register(t *testing.T) {
 			handler.ServeHTTP(rec, req)
 
 			if rec.Result().StatusCode != tt.want.StatusCode {
-				t.Errorf("The test is not passed, the test result does not satisfy the expected.")
+				t.Errorf("The status code does not match the expected one. Want %v, received %v.", tt.want.StatusCode, rec.Result().StatusCode)
 			}
-		})
-	}
-}
 
-func TestNewAuth(t *testing.T) {
-	type args struct {
-		cfg     config.Config
-		service services.AuthService
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *AuthHandler
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewAuth(tt.args.cfg, tt.args.service)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("NewAuth() error = %v, wantErr %v", err, tt.wantErr)
-				return
+			if rec.Header().Get("Content-Type") != tt.want.ContentType {
+				t.Errorf("The content type does not match the expected one. Want %v, received %v.", tt.want.ContentType, rec.Header().Get("Content-Type"))
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewAuth() got = %v, want %v", got, tt.want)
+
+			responseMap := make(map[string]any)
+			json.Unmarshal(rec.Body.Bytes(), &responseMap)
+
+			test, _ := json.Marshal(responseMap)
+
+			test2, _ := json.Marshal(tt.want.Body)
+
+			if !reflect.DeepEqual(test, test2) {
+				t.Errorf("The body does not match the expected one. Want %v, received %v.", test2, test)
 			}
 		})
 	}

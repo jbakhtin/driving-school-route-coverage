@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"net/http"
 
@@ -9,25 +11,26 @@ import (
 )
 
 func CheckAuth(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	test := func(w http.ResponseWriter, r *http.Request) error {
 		config := config.GetConfig()
 
 		tokenString := r.Header.Get("Authorization")
 		if tokenString == "" {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
+			return apperror.New(errors.New("parameters not passed"), "Unauthorized", apperror.SystemErrorCode, "", nil)
 		}
 
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
-			return []byte(config.AppKey), nil //TODO: прокинуть конфиг
+			return []byte(config.AppKey), nil
 		})
 		if err != nil || !token.Valid {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
+			return apperror.New(err, "Unauthorized", "000", "", nil)
 		}
 		next.ServeHTTP(w, r)
-	})
+		return nil
+	}
+
+	return apperror.Handler(test)
 }

@@ -6,23 +6,35 @@ import (
 )
 
 var (
-	NotFound          = New(nil, "Not found", "001", "")
-	UserAlreadyExists = New(nil, "User already exists", "002", "")
+	SystemErrorCode       = "000"
+	NotFoundCode          = "001"
+	UserAlreadyExistsCode = "002"
+	BadRequestParamsCode  = "003"
 )
+
+var (
+	NotFound          = New(nil, "Not found", NotFoundCode, "", nil)
+	UserAlreadyExists = New(nil, "User already exists", UserAlreadyExistsCode, "", nil)
+	UserNotFound      = New(nil, "User doesn't exist with this login", NotFoundCode, "", nil)
+)
+
+type Errors map[string]string
 
 type AppError struct {
 	err              error
 	Message          string `json:"message,omitempty"`
 	DeveloperMessage string `json:"developer_message,omitempty"`
 	Code             string `json:"code,omitempty"`
+	Errors           Errors `json:"errors,omitempty"`
 }
 
-func New(err error, message string, code string, developerMessage string) *AppError {
+func New(err error, message string, code string, developerMessage string, errors Errors) *AppError {
 	return &AppError{
 		err,
 		message,
 		developerMessage,
 		code,
+		errors,
 	}
 }
 
@@ -44,5 +56,5 @@ func (e *AppError) Marshal() []byte {
 }
 
 func systemError(err error) *AppError {
-	return New(err, "system error", "000", err.Error())
+	return New(err, "system error", SystemErrorCode, err.Error(), nil)
 }
