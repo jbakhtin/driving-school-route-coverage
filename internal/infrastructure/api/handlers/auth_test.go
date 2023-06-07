@@ -57,8 +57,8 @@ func TestAuthHandler_LogIn(t *testing.T) {
 			"User Success Authorized",
 			args{
 				map[string]string{
-					"login": "test",
-					"password": "test",
+					"login": "test_login",
+					"password": "test_password",
 				},
 			},
 			want{
