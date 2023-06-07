@@ -153,6 +153,7 @@ func TestAuthHandler_LogIn(t *testing.T) {
 			handler := middleware.ValidateLoginParams(h.LogIn())
 
 			rec := httptest.NewRecorder()
+			defer rec.Result().Body.Close()
 
 			buf, _ := json.Marshal(tt.args.RequestParams)
 			body := strings.NewReader(string(buf))
@@ -282,6 +283,7 @@ func TestAuthHandler_Register(t *testing.T) {
 			body := strings.NewReader(string(buf))
 
 			req, _ := http.NewRequest("POST", "/register", body)
+			defer req.Response.Body.Close()
 
 			handler.ServeHTTP(rec, req)
 
