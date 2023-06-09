@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/utils/mailer"
 	"os/signal"
 	"syscall"
 	"time"
@@ -33,6 +34,20 @@ func main() {
 	ctxServer, cancel := context.WithCancel(context.Background())
 	go func() {
 		if err = myServer.Start(ctxServer); err != nil {
+			logger.Info(err.Error())
+			return
+		}
+	}()
+
+	mailsQueue := mailer.GetMailsQueue()
+	mailSender, err := mailer.NewMailer(cfg)
+	if err != nil {
+		logger.Error(err.Error())
+		return
+	}
+
+	go func() {
+		if err = mailSender.Start(ctxServer, mailsQueue); err != nil {
 			logger.Info(err.Error())
 			return
 		}

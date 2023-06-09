@@ -1,19 +1,33 @@
 package main
 
 import (
-	"errors"
+	"context"
 	"fmt"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/utils/mailer"
+	"time"
 )
 
 func main() {
-	appError := apperror.New(nil, "test apperror", "000", "developer message test", nil)
+	mails := mailer.GetMailsQueue()
+	cfg := config.GetConfig()
 
-	test := errors.New("message test")
+	fmt.Println(cfg.Mail)
 
-	temp := errors.As(appError, &appError)
+	mail1 := mailer.Mail{
+		To:      "leperiton@yandex.ru",
+		Subject: "Ежедневное оповещение",
+		Body:    "Как дела?",
+	}
 
-	fmt.Println(temp)
-	fmt.Println(test)
-	fmt.Println(appError)
+	mailer, _ := mailer.NewMailer(cfg)
+
+	go mailer.Start(context.TODO(), mails)
+
+	mails <- mail1
+	mails <- mail1
+	mails <- mail1
+	mails <- mail1
+
+	time.Sleep(time.Minute)
 }

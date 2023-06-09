@@ -6,6 +6,7 @@ import (
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
 	ifaceservice "github.com/jbakhtin/driving-school-route-coverage/internal/interfaces/services"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/utils/mailer"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
@@ -50,6 +51,10 @@ func (h *AuthHandler) Register() http.HandlerFunc {
 
 			return err
 		}
+
+		mail := mailer.NewMail(request.Email, "Successful Registered", "You are successful registered.")
+		mailsQueue := mailer.GetMailsQueue()
+		mailsQueue <- *mail
 
 		_, err = w.Write(registerResponse.Marshal())
 		if err != nil {

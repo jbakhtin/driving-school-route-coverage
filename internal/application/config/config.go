@@ -6,11 +6,19 @@ import (
 )
 
 type Config struct {
-	ServerAddress  string `env:"ADDRESS"`
-	AppKey  string `env:"APP_KEY"`
-	DB             struct {
+	ServerAddress string `env:"ADDRESS"`
+	AppKey        string `env:"APP_KEY"`
+	DB struct {
 		DSN    string `env:"DATABASE_DSN"`
 		Driver string `env:"DATABASE_DRIVER" envDefault:"pgx"`
+	}
+	Mail struct {
+		UserName    string `env:"MAIL_USER_NAME"`
+		UserPassword string `env:"MAIL_USER_PASSWORD"`
+		FromAddress  string `env:"MAIL_FROM_ADDRESS"`
+		Host         string `env:"MAIL_HOST"`
+		Port         string `env:"MAIL_PORT"`
+		SendPerSecond int `env:"MAIL_SEND_PER_SECOND"`
 	}
 }
 
