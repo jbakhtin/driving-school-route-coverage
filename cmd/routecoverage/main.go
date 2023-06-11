@@ -33,7 +33,7 @@ func main() {
 
 	ctxServer, cancel := context.WithCancel(context.Background())
 	go func() {
-		if err = myServer.Start(ctxServer); err != nil {
+		if err = myServer.Start(); err != nil {
 			logger.Info(err.Error())
 			return
 		}
