@@ -12,12 +12,19 @@
 *.out
 
 # Binaries
-cmd/gophermart/main
-cmd/gophermart/gophermart
+cmd/routecoverage/main
+cmd/routecoverage/routecoverage
 
 # Dependency directories (remove the comment below to include it)
 vendor/
 
+# Storage
+storage/
+
 # IDEs directories
 .idea
 .vscode
+
+# Sandbox
+cmd/sandbox
+cmd/sandbox/*

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/utils/mailer"
 	"os/signal"
 	"syscall"
@@ -14,16 +13,15 @@ import (
 )
 
 func main() {
-	logger, err := zap.NewDevelopment()
-	if err != nil {
-		fmt.Println(err)
-		return
+	cfg := config.GetConfig()
+
+	logger := zap.Must(zap.NewProduction())
+	if cfg.AppEnv == "development2" {
+		logger = zap.Must(zap.NewDevelopment())
 	}
 
-	cfg := config.GetConfig()
-	if err != nil {
-		logger.Error(err.Error())
-	}
+	logger.Info("Hello, Info")
+	logger.Error("Hello, Error")
 
 	myServer, err := application.New(*cfg)
 	if err != nil {

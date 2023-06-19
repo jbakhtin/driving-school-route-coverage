@@ -1,24 +1,33 @@
 package config
 
 import (
-	"github.com/caarlos0/env/v6"
 	"sync"
+
+	"github.com/caarlos0/env/v6"
 )
 
 type Config struct {
+	AppEnv        string `env:"APP_ENV"`
 	ServerAddress string `env:"ADDRESS"`
 	AppKey        string `env:"APP_KEY"`
-	DB struct {
+	DB            struct {
 		DSN    string `env:"DATABASE_DSN"`
 		Driver string `env:"DATABASE_DRIVER" envDefault:"pgx"`
 	}
 	Mail struct {
-		UserName    string `env:"MAIL_USER_NAME"`
-		UserPassword string `env:"MAIL_USER_PASSWORD"`
-		FromAddress  string `env:"MAIL_FROM_ADDRESS"`
-		Host         string `env:"MAIL_HOST"`
-		Port         string `env:"MAIL_PORT"`
-		SendPerSecond int `env:"MAIL_SEND_PER_SECOND"`
+		UserName      string `env:"MAIL_USER_NAME"`
+		UserPassword  string `env:"MAIL_USER_PASSWORD"`
+		FromAddress   string `env:"MAIL_FROM_ADDRESS"`
+		Host          string `env:"MAIL_HOST"`
+		Port          string `env:"MAIL_PORT"`
+		SendPerSecond int    `env:"MAIL_SEND_PER_SECOND"`
+	}
+	Log struct {
+		Directory string `env:"LOG_DIRECTORY" envDefault:"storage/logs/"`
+		MaxSize int `env:"LOG_MAX_SIZE" envDefault:"1"`
+		MaxBackups int `env:"LOG_MAX_BACKUPS" envDefault:"1"`
+		MaxAge  int `env:"LOG_MAX_AGE" envDefault:"1"`
+		Compress bool `env:"LOG_Compress" envDefault:"true"`
 	}
 }
 

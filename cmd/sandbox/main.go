@@ -1,33 +1,17 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/utils/mailer"
-	"time"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application/logger"
 )
 
 func main() {
-	mails := mailer.GetMailsQueue()
-	cfg := config.GetConfig()
+	config := config.GetConfig()
+	logger := logger.New(*config)
 
-	fmt.Println(cfg.Mail)
-
-	mail1 := mailer.Mail{
-		To:      "leperiton@yandex.ru",
-		Subject: "Ежедневное оповещение",
-		Body:    "Как дела?",
+	for i := 0; i < 20000; i++ {
+		logger.Info("logger construction succeeded 2")
+		logger.Error("logger construction succeeded")
 	}
 
-	mailer, _ := mailer.NewMailer(cfg)
-
-	go mailer.Start(context.TODO(), mails)
-
-	mails <- mail1
-	mails <- mail1
-	mails <- mail1
-	mails <- mail1
-
-	time.Sleep(time.Minute)
 }
