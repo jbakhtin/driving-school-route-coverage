@@ -15,7 +15,7 @@ type Logger struct {
 	zap.Logger
 }
 
-func New(cfg config.Config) *Logger {
+func New(cfg config.Config) (*Logger, error) {
 	var tops []teeOption
 
 	if cfg.AppEnv == "dev" {
@@ -31,7 +31,7 @@ func New(cfg config.Config) *Logger {
 		dir1 := fmt.Sprintf("%vinfo/", cfg.Log.Directory)
 		err := os.MkdirAll(dir1,0777)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		w := zapcore.AddSync(&lumberjack.Logger{
@@ -53,7 +53,7 @@ func New(cfg config.Config) *Logger {
 		dir2 := fmt.Sprintf("%verror/", cfg.Log.Directory)
 		err = os.MkdirAll(dir2,0777)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 
 		w = zapcore.AddSync(&lumberjack.Logger{
@@ -78,7 +78,7 @@ func New(cfg config.Config) *Logger {
 	}
 	defer logger.Sync()
 
-	return logger
+	return logger, nil
 }
 
 type LevelEnablerFunc func(lvl zapcore.Level) bool

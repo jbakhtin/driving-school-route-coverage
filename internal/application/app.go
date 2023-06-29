@@ -2,14 +2,13 @@ package application
 
 import (
 	"fmt"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/composites/api"
-	"net/http"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/composites/api"
 	appMiddleware "github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/api/middleware"
+	"net/http"
 )
 
 type Server struct {
@@ -60,10 +59,11 @@ func notFound() http.HandlerFunc {
 }
 
 func (s *Server) Start() error {
-	err := s.ListenAndServe()
-	if err != nil {
-		return err
-	}
+	var err error
 
-	return nil
+	go func() {
+		err = s.ListenAndServe()
+	}()
+
+	return err
 }

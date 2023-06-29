@@ -12,7 +12,7 @@ import (
 
 func CheckAuth(next http.Handler) http.Handler {
 	test := func(w http.ResponseWriter, r *http.Request) error {
-		config := config.GetConfig()
+		config, err := config.GetConfig()
 
 		tokenString := r.Header.Get("Authorization")
 		if tokenString == "" {

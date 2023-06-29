@@ -1,17 +1,16 @@
 package main
 
 import (
-	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/application/logger"
+	"fmt"
+	"time"
 )
 
 func main() {
-	config := config.GetConfig()
-	logger := logger.New(*config)
+	t := time.Date(2022, 8, 10, 18, 11, 11, 0, time.UTC)
 
-	for i := 0; i < 20000; i++ {
-		logger.Info("logger construction succeeded 2")
-		logger.Error("logger construction succeeded")
-	}
+	fmt.Println(fmt.Sprintf("seconds: %v", t.Unix()))
+	fmt.Println(fmt.Sprintf("mili s: %v", t.UnixMilli()))
+	fmt.Println(fmt.Sprintf("micro s: %v", t.UnixMicro()))
+	fmt.Println(fmt.Sprintf("nanos : %v", t.UnixNano()))
 
 }

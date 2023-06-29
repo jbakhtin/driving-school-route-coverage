@@ -81,6 +81,12 @@ func (m *Mailer) Send(mail *Mail) error {
 		fmt.Println(err)
 	}
 
-	//fmt.Println(fmt.Printf("Send message to %v. Message subject %v", mail.To, mail.Subject))
+	return nil
+}
+
+func Shutdown(ctx context.Context) error {
+	fmt.Println("Mailer shut down")
+	timer := time.NewTimer(time.Second * 12)
+	<-timer.C
 	return nil
 }

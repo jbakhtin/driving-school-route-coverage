@@ -31,14 +31,19 @@ type Config struct {
 	}
 }
 
+func (c Config) Error() string {
+	panic("implement me")
+}
+
 var config Config
+var err error
 var once sync.Once
 
-func GetConfig() *Config {
+func GetConfig() (*Config, error) {
 	once.Do(func() {
-		config, _ = NewConfigBuilder().WithAllFromEnv().Build()
+		config, err = NewConfigBuilder().WithAllFromEnv().Build()
 	})
-	return &config
+	return &config, err
 }
 
 type Builder struct {
