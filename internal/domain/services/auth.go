@@ -3,13 +3,13 @@ package services
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
-	"strings"
-
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
 	"go.uber.org/zap"
 )
@@ -45,13 +45,13 @@ type UserRegistrationResponse struct {
 	Message string `json:"message,omitempty"`
 }
 
-func (e *UserRegistrationResponse) Marshal() []byte {
+func (e *UserRegistrationResponse) Marshal() ([]byte, error) {
 	marshal, err := json.Marshal(e)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	return marshal
+	return marshal, nil
 }
 
 type AuthService struct {
@@ -74,7 +74,7 @@ func NewAuthService(cfg config.Config, repo repositories.UserRepository) (*AuthS
 }
 
 func (us *AuthService) RegisterUser(request UserRegistrationRequest) (*UserRegistrationResponse, error) {
-	user := repositories.UserRegistration{
+	userRegistration := repositories.UserRegistration{
 		Name:     request.Name,
 		Lastname: request.Lastname,
 		Email:    request.Email,
@@ -82,13 +82,21 @@ func (us *AuthService) RegisterUser(request UserRegistrationRequest) (*UserRegis
 		Password: request.Password,
 	}
 
+	user, err := us.repo.GetUserByLogin(userRegistration.Login)
+	if err != nil && !errors.Is(err, sql.ErrNoRows) {
+		return nil, err
+	}
+	if user != nil  {
+		return nil, apperror.UserAlreadyExists
+	}
+
 	h := hmac.New(sha256.New, []byte(us.config.AppKey))
-	h.Write([]byte(fmt.Sprintf("%s:%s", user.Login, user.Password)))
+	h.Write([]byte(fmt.Sprintf("%s:%s", userRegistration.Login, userRegistration.Password)))
 	dst := h.Sum(nil)
 
-	user.Password = fmt.Sprintf("%x", dst)
+	userRegistration.Password = fmt.Sprintf("%x", dst)
 
-	_, err := us.repo.CreateUser(user)
+	_, err = us.repo.CreateUser(userRegistration)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +117,7 @@ func (us *AuthService) LoginUser(request UserLoginRequest) (*UserLoginResponse, 
 	// TODO: find user
 	user, err := us.repo.GetUserByLogin(userLogin.Login)
 	if err != nil {
-		if strings.Contains(err.Error(), "sql: no rows in result set") {
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, apperror.UserNotFound
 		}
 

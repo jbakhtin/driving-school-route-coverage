@@ -10,7 +10,6 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"net/http"
-	"strings"
 )
 
 type AuthHandler struct {
@@ -45,10 +44,6 @@ func (h *AuthHandler) Register() http.HandlerFunc {
 
 		registerResponse, err := h.service.RegisterUser(request)
 		if err != nil {
-			if strings.Contains(err.Error(), "duplicate key value violates") {
-				return apperror.UserAlreadyExists
-			}
-
 			return err
 		}
 
@@ -56,10 +51,16 @@ func (h *AuthHandler) Register() http.HandlerFunc {
 		mailsQueue := mailer.GetMailsQueue()
 		mailsQueue <- *mail
 
-		_, err = w.Write(registerResponse.Marshal())
+		registerResponseJSON, err := registerResponse.Marshal()
 		if err != nil {
 			return err
 		}
+
+		_, err = w.Write(registerResponseJSON)
+		if err != nil {
+			return err
+		}
+
 		w.WriteHeader(http.StatusCreated)
 		return nil
 	}

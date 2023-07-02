@@ -26,7 +26,10 @@ func New(cfg config.Config) (*Server, error) {
 
 	r.NotFound(notFound())
 
-	authComposite, _ := api.NewAuthComposite(cfg)
+	authComposite, err := api.NewAuthComposite(cfg)
+	if err != nil {
+		return nil, err
+	}
 	authComposite.Register(r)
 
 	r.Group(func(r chi.Router) {

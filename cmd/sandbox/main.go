@@ -1,16 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
-	"time"
 )
 
 func main() {
-	t := time.Date(2022, 8, 10, 18, 11, 11, 0, time.UTC)
+	var ErrorDuplicateKey error = errors.New("duplicate key value violates unique constraint")
+	var ErrorTest error = errors.New("duplicate key value violates unique constraint")
 
-	fmt.Println(fmt.Sprintf("seconds: %v", t.Unix()))
-	fmt.Println(fmt.Sprintf("mili s: %v", t.UnixMilli()))
-	fmt.Println(fmt.Sprintf("micro s: %v", t.UnixMicro()))
-	fmt.Println(fmt.Sprintf("nanos : %v", t.UnixNano()))
-
+	fmt.Println(ErrorDuplicateKey.Error() == ErrorTest.Error())
 }
