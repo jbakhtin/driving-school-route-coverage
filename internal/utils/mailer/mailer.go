@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application/logger"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/utils/ratelimiter"
 	"net/smtp"
 	"sync"
@@ -16,7 +17,7 @@ type Mail struct {
 	Body string
 }
 
-func NewMail(to string, subject string, body string) *Mail {
+func NewMail(to, subject, body string) *Mail {
 	return &Mail{
 		to,
 		subject,
@@ -27,20 +28,27 @@ func NewMail(to string, subject string, body string) *Mail {
 var mails chan Mail
 var once sync.Once
 
-func GetMailsQueue() chan Mail {
+func GetMailsQueue() (chan Mail, error) {
+	var err error
 	once.Do(func() {
-		mails = make(chan Mail, 5)
+		cfg, err := config.GetConfig()
+		if err != nil {
+			return
+		}
+		mails = make(chan Mail, cfg.Mail.QueueSize)
 	})
-	return mails
+	return mails, err
 }
 
 type Mailer struct {
 	config *config.Config
+	logger *logger.Logger
 }
 
-func NewMailer(cfg *config.Config) (*Mailer, error) {
+func NewMailer(cfg *config.Config, logger *logger.Logger) (*Mailer, error) {
 	return &Mailer{
 		cfg,
+		logger,
 	}, nil
 }
 
@@ -61,7 +69,7 @@ func (m *Mailer) Start(ctx context.Context, mails chan Mail) error {
 			go func() {
 				err := m.Send(&mail)
 				if err != nil {
-					fmt.Println(err)
+					m.logger.Error(err.Error())
 				}
 			}()
 		}

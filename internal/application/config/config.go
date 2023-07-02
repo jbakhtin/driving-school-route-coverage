@@ -21,6 +21,7 @@ type Config struct {
 		Host          string `env:"MAIL_HOST"`
 		Port          string `env:"MAIL_PORT"`
 		SendPerSecond int    `env:"MAIL_SEND_PER_SECOND"`
+		QueueSize int    `env:"MAIL_QUEUE_SIZE" envDefault:"100"`
 	}
 	Log struct {
 		Directory string `env:"LOG_DIRECTORY" envDefault:"storage/logs/"`

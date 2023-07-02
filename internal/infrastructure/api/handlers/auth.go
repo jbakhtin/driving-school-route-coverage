@@ -48,7 +48,10 @@ func (h *AuthHandler) Register() http.HandlerFunc {
 		}
 
 		mail := mailer.NewMail(request.Email, "Successful Registered", "You are successful registered.")
-		mailsQueue := mailer.GetMailsQueue()
+		mailsQueue, err := mailer.GetMailsQueue()
+		if err != nil {
+			return err
+		}
 		mailsQueue <- *mail
 
 		registerResponseJSON, err := registerResponse.Marshal()

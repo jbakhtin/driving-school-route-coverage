@@ -37,8 +37,11 @@ func main() {
 		logger.Fatal(err.Error())
 	}
 
-	mailsQueue := mailer.GetMailsQueue()
-	mailSender, err := mailer.NewMailer(cfg)
+	mailsQueue, err := mailer.GetMailsQueue()
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+	mailSender, err := mailer.NewMailer(cfg, logger)
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
