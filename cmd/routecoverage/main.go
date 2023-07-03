@@ -14,7 +14,8 @@ import (
 )
 
 func main() {
-	osCtx, _ := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+	osCtx, cancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+	defer cancel()
 
 	cfg, err := config.GetConfig()
 	if err != nil {
@@ -57,7 +58,8 @@ func main() {
 
 	// Gracefully shut down
 	<-osCtx.Done()
-	withTimeout, _ := context.WithTimeout(context.Background(), time.Second * 10)
+	withTimeout, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+	defer cancel()
 
 	err = closer.Close(withTimeout)
 	if err != nil {

@@ -13,6 +13,9 @@ import (
 func CheckAuth(next http.Handler) http.Handler {
 	test := func(w http.ResponseWriter, r *http.Request) error {
 		config, err := config.GetConfig()
+		if err != nil {
+			return err
+		}
 
 		tokenString := r.Header.Get("Authorization")
 		if tokenString == "" {
