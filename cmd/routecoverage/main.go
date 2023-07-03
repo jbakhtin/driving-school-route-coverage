@@ -30,7 +30,7 @@ func main() {
 	closer, _ := closer.New(logger)
 
 	var myServer *application.Server
-	if myServer, err = application.New(*cfg); err != nil {
+	if myServer, err = application.New(osCtx, *cfg); err != nil {
 		logger.Fatal(err.Error())
 	}
 

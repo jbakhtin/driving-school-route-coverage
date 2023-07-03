@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"github.com/go-chi/chi/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
@@ -37,7 +38,7 @@ func NewAuthComposite(cfg config.Config) (*AuthComposite, error) {
 	}, nil
 }
 
-func (c *AuthComposite) Register(router chi.Router) {
-	router.With(appMiddleware.ValidateRegistrationParams).Post("/register", c.handler.Register())
-	router.With(appMiddleware.ValidateLoginParams).Post("/login", c.handler.LogIn())
+func (c *AuthComposite) Register(ctx context.Context, router chi.Router) {
+	router.With(appMiddleware.ValidateRegistrationParams).Post("/register", c.handler.Register(ctx))
+	router.With(appMiddleware.ValidateLoginParams).Post("/login", c.handler.LogIn(ctx))
 }

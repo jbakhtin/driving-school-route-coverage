@@ -1,7 +1,7 @@
 package application
 
 import (
-	"fmt"
+	"context"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
@@ -16,7 +16,7 @@ type Server struct {
 	config *config.Config
 }
 
-func New(cfg config.Config) (*Server, error) {
+func New(ctx context.Context, cfg config.Config) (*Server, error) {
 	r := chi.NewRouter()
 
 	r.Use(middleware.RequestID)
@@ -30,14 +30,21 @@ func New(cfg config.Config) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
-	authComposite.Register(r)
+	authComposite.Register(ctx, r)
+
+
 
 	r.Group(func(r chi.Router) {
 		r.Use(appMiddleware.CheckAuth)
 
-		r.Get("/test", func(writer http.ResponseWriter, request *http.Request) {
-			fmt.Println("test")
-		})
+		r.Get("/test", apperror.Handler(func(writer http.ResponseWriter, request *http.Request) error {
+			_, err := writer.Write([]byte("test"))
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}))
 	})
 
 	server := http.Server{

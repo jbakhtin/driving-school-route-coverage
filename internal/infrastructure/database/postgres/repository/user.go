@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/models"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/database/postgres"
@@ -17,9 +18,9 @@ func NewUserRepository(client *postgres.Postgres) (*UserRepository, error) {
 	}, nil
 }
 
-func (ur *UserRepository) CreateUser(user repositories.UserRegistration) (*models.User, error) {
+func (ur *UserRepository) CreateUser(ctx context.Context, user repositories.UserRegistration) (*models.User, error) {
 	var stored models.User
-	err := ur.QueryRow(query.CreateUser, &user.Name, &user.Lastname, &user.Login, &user.Email, &user.Password).
+	err := ur.QueryRowContext(ctx, query.CreateUser, &user.Name, &user.Lastname, &user.Login, &user.Email, &user.Password).
 		Scan(&stored.ID,
 			&stored.Name,
 			&stored.Lastname,
@@ -36,9 +37,9 @@ func (ur *UserRepository) CreateUser(user repositories.UserRegistration) (*model
 	return &stored, nil
 }
 
-func (ur *UserRepository) GetUserByID(id int) (*models.User, error) {
+func (ur *UserRepository) GetUserByID(ctx context.Context, id int) (*models.User, error) {
 	var user models.User
-	err := ur.QueryRow(query.GetUserByID, id).
+	err := ur.QueryRowContext(ctx, query.GetUserByID, id).
 		Scan(&user.ID,
 			&user.Name,
 			&user.Lastname,
@@ -55,9 +56,9 @@ func (ur *UserRepository) GetUserByID(id int) (*models.User, error) {
 	return &user, nil
 }
 
-func (ur *UserRepository) GetUserByLogin(login string) (*models.User, error) {
+func (ur *UserRepository) GetUserByLogin(ctx context.Context, login string) (*models.User, error) {
 	var user models.User
-	err := ur.QueryRow(query.GetUserByLogin, login).
+	err := ur.QueryRowContext(ctx, query.GetUserByLogin, login).
 		Scan(&user.ID,
 			&user.Name,
 			&user.Lastname,
@@ -74,14 +75,14 @@ func (ur *UserRepository) GetUserByLogin(login string) (*models.User, error) {
 	return &user, nil
 }
 
-func (ur *UserRepository) GetUsers() ([]models.User, error) {
+func (ur *UserRepository) GetUsers(ctx context.Context) ([]models.User, error) {
 	return nil, nil
 }
 
-func (ur *UserRepository) UpdateUser() (bool, error) {
+func (ur *UserRepository) UpdateUser(ctx context.Context) (bool, error) {
 	return false, nil
 }
 
-func (ur *UserRepository) DeleteUser() (bool, error) {
+func (ur *UserRepository) DeleteUser(ctx context.Context) (bool, error) {
 	return false, nil
 }

@@ -1,6 +1,9 @@
 package repositories
 
-import "github.com/jbakhtin/driving-school-route-coverage/internal/domain/models"
+import (
+	"context"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/models"
+)
 
 type UserRegistration struct {
 	Name     string `json:"name,omitempty"`
@@ -11,10 +14,10 @@ type UserRegistration struct {
 }
 
 type UserRepository interface {
-	GetUserByID(id int) (*models.User, error)
-	GetUserByLogin(login string) (*models.User, error)
-	GetUsers() ([]models.User, error)
-	CreateUser(user UserRegistration) (*models.User, error)
-	UpdateUser() (bool, error)
-	DeleteUser() (bool, error)
+	GetUserByID(ctx context.Context, id int) (*models.User, error)
+	GetUserByLogin(ctx context.Context, login string) (*models.User, error)
+	GetUsers(ctx context.Context) ([]models.User, error)
+	CreateUser(ctx context.Context, user UserRegistration) (*models.User, error)
+	UpdateUser(ctx context.Context) (bool, error)
+	DeleteUser(ctx context.Context) (bool, error)
 }

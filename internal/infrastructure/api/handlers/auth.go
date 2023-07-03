@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
@@ -31,7 +32,7 @@ func NewAuth(cfg config.Config, service ifaceservice.AuthService) (*AuthHandler,
 	}, nil
 }
 
-func (h *AuthHandler) Register() http.HandlerFunc {
+func (h *AuthHandler) Register(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json")
 
@@ -42,7 +43,7 @@ func (h *AuthHandler) Register() http.HandlerFunc {
 			return err
 		}
 
-		registerResponse, err := h.service.RegisterUser(request)
+		registerResponse, err := h.service.RegisterUser(ctx, request)
 		if err != nil {
 			return err
 		}
@@ -71,7 +72,7 @@ func (h *AuthHandler) Register() http.HandlerFunc {
 	return apperror.Handler(fn)
 }
 
-func (h *AuthHandler) LogIn() http.HandlerFunc {
+func (h *AuthHandler) LogIn(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 
 		body, _ := io.ReadAll(r.Body)
@@ -81,7 +82,7 @@ func (h *AuthHandler) LogIn() http.HandlerFunc {
 			return err
 		}
 
-		response, err := h.service.LoginUser(request)
+		response, err := h.service.LoginUser(ctx, request)
 		if err != nil {
 			return err
 		}

@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"database/sql"
@@ -73,7 +74,7 @@ func NewAuthService(cfg config.Config, repo repositories.UserRepository) (*AuthS
 	}, nil
 }
 
-func (us *AuthService) RegisterUser(request UserRegistrationRequest) (*UserRegistrationResponse, error) {
+func (us *AuthService) RegisterUser(ctx context.Context, request UserRegistrationRequest) (*UserRegistrationResponse, error) {
 	userRegistration := repositories.UserRegistration{
 		Name:     request.Name,
 		Lastname: request.Lastname,
@@ -82,7 +83,7 @@ func (us *AuthService) RegisterUser(request UserRegistrationRequest) (*UserRegis
 		Password: request.Password,
 	}
 
-	user, err := us.repo.GetUserByLogin(userRegistration.Login)
+	user, err := us.repo.GetUserByLogin(ctx, userRegistration.Login)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, err
 	}
@@ -96,7 +97,7 @@ func (us *AuthService) RegisterUser(request UserRegistrationRequest) (*UserRegis
 
 	userRegistration.Password = fmt.Sprintf("%x", dst)
 
-	_, err = us.repo.CreateUser(userRegistration)
+	_, err = us.repo.CreateUser(ctx, userRegistration)
 	if err != nil {
 		return nil, err
 	}
@@ -108,14 +109,14 @@ func (us *AuthService) RegisterUser(request UserRegistrationRequest) (*UserRegis
 	return &response, nil
 }
 
-func (us *AuthService) LoginUser(request UserLoginRequest) (*UserLoginResponse, error) {
+func (us *AuthService) LoginUser(ctx context.Context, request UserLoginRequest) (*UserLoginResponse, error) {
 	userLogin := repositories.UserRegistration{
 		Login:    request.Login,
 		Password: request.Password,
 	}
 
 	// TODO: find user
-	user, err := us.repo.GetUserByLogin(userLogin.Login)
+	user, err := us.repo.GetUserByLogin(ctx, userLogin.Login)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, apperror.UserNotFound
