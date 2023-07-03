@@ -16,7 +16,12 @@ import (
 )
 
 func TestAuthHandler_LogIn(t *testing.T) {
-	cfg := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
 	pgClient, err := postgres.New(*cfg)
 	if err != nil {
 		t.Errorf(err.Error())
@@ -188,7 +193,12 @@ func TestAuthHandler_LogIn(t *testing.T) {
 }
 
 func TestAuthHandler_Register(t *testing.T) {
-	cfg := config.GetConfig()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		t.Errorf(err.Error())
+		return
+	}
+
 	pgClient, err := postgres.New(*cfg)
 	if err != nil {
 		t.Errorf(err.Error())
