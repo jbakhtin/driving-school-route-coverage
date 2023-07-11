@@ -58,7 +58,7 @@ func main() {
 
 	// Gracefully shut down
 	<-osCtx.Done()
-	withTimeout, cancel := context.WithTimeout(context.Background(), time.Second * 10)
+	withTimeout, cancel := context.WithTimeout(context.Background(), time.Second * cfg.ShutdownTimeout)
 	defer cancel()
 
 	err = closer.Close(withTimeout)

@@ -47,10 +47,10 @@ func (c *Closer) Close(ctx context.Context) error {
 	}()
 
 	select {
-	case <-complete:
-		break
 	case <-ctx.Done():
 		return fmt.Errorf("shutdown cancelled: %v", ctx.Err())
+	case <-complete:
+		break
 	}
 
 	if len(msgs) > 0 {

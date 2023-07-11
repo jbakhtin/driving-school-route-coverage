@@ -32,6 +32,11 @@ func New(ctx context.Context, cfg config.Config) (*Server, error) {
 	}
 	authComposite.Register(ctx, r)
 
+	routeComposite, err := api.NewRouteComposite(cfg)
+	if err != nil {
+		return nil, err
+	}
+	routeComposite.Register(ctx, r)
 
 
 	r.Group(func(r chi.Router) {

@@ -2,15 +2,17 @@ package config
 
 import (
 	"sync"
+	"time"
 
 	"github.com/caarlos0/env/v6"
 )
 
 type Config struct {
-	AppEnv        string `env:"APP_ENV"`
-	ServerAddress string `env:"ADDRESS"`
-	AppKey        string `env:"APP_KEY"`
-	DB            struct {
+	AppEnv          string        `env:"APP_ENV"`
+	ServerAddress   string        `env:"ADDRESS"`
+	AppKey          string        `env:"APP_KEY"`
+	ShutdownTimeout time.Duration `env:"SHUTDOWN_TIMEOUT" envDefault:"2s"`
+	DB              struct {
 		DSN    string `env:"DATABASE_DSN"`
 		Driver string `env:"DATABASE_DRIVER" envDefault:"pgx"`
 	}
@@ -21,14 +23,14 @@ type Config struct {
 		Host          string `env:"MAIL_HOST"`
 		Port          string `env:"MAIL_PORT"`
 		SendPerSecond int    `env:"MAIL_SEND_PER_SECOND"`
-		QueueSize int    `env:"MAIL_QUEUE_SIZE" envDefault:"100"`
+		QueueSize     int    `env:"MAIL_QUEUE_SIZE" envDefault:"100"`
 	}
 	Log struct {
-		Directory string `env:"LOG_DIRECTORY" envDefault:"storage/logs/"`
-		MaxSize int `env:"LOG_MAX_SIZE" envDefault:"1"`
-		MaxBackups int `env:"LOG_MAX_BACKUPS" envDefault:"1"`
-		MaxAge  int `env:"LOG_MAX_AGE" envDefault:"1"`
-		Compress bool `env:"LOG_Compress" envDefault:"true"`
+		Directory  string `env:"LOG_DIRECTORY" envDefault:"storage/logs/"`
+		MaxSize    int    `env:"LOG_MAX_SIZE" envDefault:"1"`
+		MaxBackups int    `env:"LOG_MAX_BACKUPS" envDefault:"1"`
+		MaxAge     int    `env:"LOG_MAX_AGE" envDefault:"1"`
+		Compress   bool   `env:"LOG_Compress" envDefault:"true"`
 	}
 }
 
