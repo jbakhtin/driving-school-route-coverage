@@ -41,6 +41,13 @@ func NewRouteComposite(cfg config.Config) (*RouteComposite, error) {
 func (c *RouteComposite) Register(ctx context.Context, router chi.Router) {
 	router.Route("/routes", func(r chi.Router) {
 		r.Use(appMiddleware.CheckAuth)
-		r.With(appMiddleware.ValidateRouteCreationParams).Post("/create", c.handler.Create(ctx))
+		r.Get("/", c.handler.Get(ctx))
+		r.Post("/", c.handler.Create(ctx))
+
+		r.Route("/{routeID}", func(r chi.Router) {
+			r.Get("/", c.handler.Show(ctx))
+			r.Put("/", c.handler.Update(ctx))
+			r.Delete("/", c.handler.Delete(ctx))
+		})
 	})
 }

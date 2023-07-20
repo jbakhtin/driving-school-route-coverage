@@ -16,15 +16,13 @@ import (
 
 func main() {
 
-	point1 := geom.NewPoint(geom.XY).MustSetCoords([]float64{1.0, 2.0})
-	point2 := geom.NewPoint(geom.XY).MustSetCoords([]float64{3.0, 4.0})
-	point3 := geom.NewPoint(geom.XY).MustSetCoords([]float64{5.0, 6.0})
 	// Создание линии с использованием точек
 	lineString := geom.NewLineString(geom.XY).MustSetCoords([]geom.Coord{
-		point1.Coords(),
-		point2.Coords(),
-		point3.Coords(),
+		[]float64{1.0, 2.0},
+		[]float64{1.0, 2.0},
+		[]float64{1.0, 2.0},
 	})
+
 
 	test, _ := wkb.Marshal(lineString, binary.LittleEndian)
 

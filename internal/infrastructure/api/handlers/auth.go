@@ -37,6 +37,7 @@ func (h *AuthHandler) Register(ctx context.Context) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 
 		body, _ := io.ReadAll(r.Body)
+		defer r.Body.Close()
 		var request services.UserRegistrationRequest
 		err := json.Unmarshal(body, &request)
 		if err != nil {

@@ -94,7 +94,7 @@ func (m *Mailer) Send(mail *Mail) error {
 
 func Shutdown(ctx context.Context) error {
 	fmt.Println("Mailer shut down")
-	timer := time.NewTimer(time.Second * 12)
+	timer := time.NewTimer(time.Second * 1)
 	<-timer.C
 	return nil
 }

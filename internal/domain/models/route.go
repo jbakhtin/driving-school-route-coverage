@@ -14,12 +14,8 @@ func (ls LineString) MarshalJSON() ([]byte, error) {
 }
 
 type Route struct {
-	Id int64
+	ID int64
 	LineString LineString
 	CreatedAt string
 	UpdatedAt *string
-}
-
-func (r *Route) ToJSON() {
-
 }

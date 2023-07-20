@@ -11,4 +11,5 @@ type RouteCreation struct {
 
 type RouteRepository interface {
 	CreateRoute(ctx context.Context, routeCreation RouteCreation) (*models.Route, error)
+	GetRouteByID(ctx context.Context, routeID string) (*models.Route, error)
 }

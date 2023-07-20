@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/models"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/database/postgres"
@@ -22,9 +21,8 @@ func NewRouteRepository(client *postgres.Postgres) (*RouteRepository, error) {
 func (ur *RouteRepository) CreateRoute(ctx context.Context, routeCreation repositories.RouteCreation) (*models.Route, error) {
 	var stored models.Route
 
-	fmt.Println(routeCreation)
 	err := ur.QueryRowContext(ctx, query.CreateRoute, &routeCreation.LineString).
-		Scan(&stored.Id, &stored.LineString, &stored.CreatedAt, &stored.UpdatedAt)
+		Scan(&stored.ID, &stored.LineString, &stored.CreatedAt, &stored.UpdatedAt)
 
 	if err != nil {
 		return nil, err
@@ -33,21 +31,17 @@ func (ur *RouteRepository) CreateRoute(ctx context.Context, routeCreation reposi
 	return &stored, nil
 }
 
-func (ur *RouteRepository) GetRouteByID(ctx context.Context, id int) (*models.User, error) {
-	var user models.User
-	err := ur.QueryRowContext(ctx, query.GetUserByID, id).
-		Scan(&user.ID,
-			&user.Name,
-			&user.Lastname,
-			&user.Login,
-			&user.Email,
-			&user.Password,
-			&user.CreatedAt,
-			&user.UpdatedAt)
+func (ur *RouteRepository) GetRouteByID(ctx context.Context, routeID string) (*models.Route, error) {
+	var route models.Route
+	err := ur.QueryRowContext(ctx, query.GetRouteById, routeID).
+		Scan(&route.ID,
+			&route.LineString,
+			&route.CreatedAt,
+			&route.UpdatedAt)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	return &route, nil
 }
