@@ -3,18 +3,12 @@ package services
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/models"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
-	"github.com/twpayne/go-geom"
+	ifaceservice "github.com/jbakhtin/driving-school-route-coverage/internal/interfaces/services"
 	"github.com/twpayne/go-geom/encoding/geojson"
 )
-
-type LineString struct {
-	Type string `json:"type" validate:"required,eq='LineString'"`
-	Coordinates []geom.Coord `json:"coordinates" validate:"required,linestring"`
-}
 
 type RouteCreationDTO struct {
 	Name string `json:"name" validate:"required"`
@@ -23,15 +17,6 @@ type RouteCreationDTO struct {
 
 type RouteCreatedDTO struct {
 	Message string `json:"message,omitempty"`
-}
-
-func (e *RouteCreatedDTO) Marshal() ([]byte, error) {
-	marshal, err := json.Marshal(e)
-	if err != nil {
-		return nil, err
-	}
-
-	return marshal, nil
 }
 
 type RouteService struct {
@@ -46,19 +31,18 @@ func NewRouteService(cfg config.Config, repo repositories.RouteRepository) (*Rou
 	}, nil
 }
 
-func (us *RouteService) CreateRoute(ctx context.Context, routeCreationDto RouteCreationDTO) (*models.Route, error) {
+func (us *RouteService) CreateRoute(ctx context.Context, routeCreationDto ifaceservice.RouteCreationDTO) (*models.Route, error) {
 	bytes, _ := json.Marshal(routeCreationDto.Line)
 
-	routeCreation := repositories.RouteCreation{
-		bytes,
+	createUser := repositories.CreateRoute{
+		Name:       routeCreationDto.Name,
+		LineString: bytes,
 	}
 
-	route, err := us.repo.CreateRoute(ctx, routeCreation)
+	route, err := us.repo.CreateRoute(ctx, createUser)
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(route)
 
 	return route, nil
 }
@@ -72,3 +56,20 @@ func (us *RouteService) GetRouteByID(ctx context.Context, routeID string) (*mode
 	return route, nil
 }
 
+func (us *RouteService) UpdateRouteByID(ctx context.Context, routeID string, updateRoute ifaceservice.UpdateRoute) (*models.Route, error) {
+	bytes, err := json.Marshal(updateRoute.Geometry)
+	if err != nil {
+		return nil, err
+	}
+
+	updateRouteData := repositories.UpdateRoute{
+		Name: updateRoute.Name,
+		LineString: bytes,
+	}
+	route, err := us.repo.UpdateRouteByID(ctx, routeID, updateRouteData)
+	if err != nil {
+		return nil, err
+	}
+
+	return route, nil
+}

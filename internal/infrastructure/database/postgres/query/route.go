@@ -14,4 +14,11 @@ const (
 	GetRoutes = `
 		SELECT * FROM routes
 	`
+
+	UpdateRouteById = `
+		UPDATE routes
+		SET line = ST_AsGeoJSON($2), updated_at = now()
+		WHERE id = $1
+		RETURNING id, ST_AsBinary(line), created_at, updated_at
+	`
 )

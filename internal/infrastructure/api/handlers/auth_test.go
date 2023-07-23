@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	authService "github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
@@ -155,7 +156,7 @@ func TestAuthHandler_LogIn(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := middleware.ValidateLoginParams(h.LogIn())
+			handler := middleware.ValidateLoginParams(h.LogIn(context.TODO()))
 
 			rec := httptest.NewRecorder()
 			defer rec.Result().Body.Close()
@@ -288,7 +289,7 @@ func TestAuthHandler_Register(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			handler := middleware.ValidateRegistrationParams(h.Register())
+			handler := middleware.ValidateRegistrationParams(h.Register(context.TODO()))
 
 			rec := httptest.NewRecorder()
 

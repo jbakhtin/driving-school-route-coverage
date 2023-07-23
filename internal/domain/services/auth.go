@@ -5,55 +5,15 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"database/sql"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
+	ifaceservice "github.com/jbakhtin/driving-school-route-coverage/internal/interfaces/services"
 	"go.uber.org/zap"
 )
-
-type UserLoginRequest struct {
-	Login    string `json:"login,omitempty"`
-	Password string `json:"password,omitempty"`
-}
-
-type UserLoginResponse struct {
-	Token string `json:"token,omitempty"`
-}
-
-func (ulr *UserLoginResponse) Marshal() []byte {
-	marshal, err := json.Marshal(ulr)
-	if err != nil {
-		return nil
-	}
-
-	return marshal
-}
-
-type UserRegistrationRequest struct {
-	Name                 string `json:"name"`
-	Lastname             string `json:"lastname"`
-	Email                string `json:"email"`
-	Login                string `json:"login"`
-	Password             string `json:"password"`
-	PasswordConfirmation string `json:"password_confirmation"`
-}
-
-type UserRegistrationResponse struct {
-	Message string `json:"message,omitempty"`
-}
-
-func (e *UserRegistrationResponse) Marshal() ([]byte, error) {
-	marshal, err := json.Marshal(e)
-	if err != nil {
-		return nil, err
-	}
-
-	return marshal, nil
-}
 
 type AuthService struct {
 	logger *zap.Logger
@@ -74,7 +34,7 @@ func NewAuthService(cfg config.Config, repo repositories.UserRepository) (*AuthS
 	}, nil
 }
 
-func (us *AuthService) RegisterUser(ctx context.Context, request UserRegistrationRequest) (*UserRegistrationResponse, error) {
+func (us *AuthService) RegisterUser(ctx context.Context, request ifaceservice.UserRegistrationRequest) (*ifaceservice.UserRegistrationResponse, error) {
 	userRegistration := repositories.UserRegistration{
 		Name:     request.Name,
 		Lastname: request.Lastname,
@@ -102,14 +62,14 @@ func (us *AuthService) RegisterUser(ctx context.Context, request UserRegistratio
 		return nil, err
 	}
 
-	response := UserRegistrationResponse{
+	response := ifaceservice.UserRegistrationResponse{
 		Message: "User created",
 	}
 
 	return &response, nil
 }
 
-func (us *AuthService) LoginUser(ctx context.Context, request UserLoginRequest) (*UserLoginResponse, error) {
+func (us *AuthService) LoginUser(ctx context.Context, request ifaceservice.UserLoginRequest) (*ifaceservice.UserLoginResponse, error) {
 	userLogin := repositories.UserRegistration{
 		Login:    request.Login,
 		Password: request.Password,
@@ -141,7 +101,7 @@ func (us *AuthService) LoginUser(ctx context.Context, request UserLoginRequest) 
 		return nil, err
 	}
 
-	var response UserLoginResponse
+	var response ifaceservice.UserLoginResponse
 
 	response.Token = tokenString
 

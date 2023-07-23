@@ -3,11 +3,9 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
 	ifaceservice "github.com/jbakhtin/driving-school-route-coverage/internal/interfaces/services"
 	"io"
 	"net/http"
@@ -36,14 +34,11 @@ func (h *RouteHandler) Create(ctx context.Context) http.HandlerFunc {
 		}
 		defer r.Body.Close()
 
-		var routeCreationDTO services.RouteCreationDTO
+		var routeCreationDTO ifaceservice.RouteCreationDTO
 		err = json.Unmarshal(body, &routeCreationDTO)
 		if err != nil {
 			return err
 		}
-
-		fmt.Println(routeCreationDTO)
-		fmt.Println("---")
 
 		route, err := h.service.CreateRoute(ctx, routeCreationDTO)
 		if err != nil {
@@ -99,6 +94,31 @@ func (h *RouteHandler) Update(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json")
 
+		routeID := chi.URLParam(r, "routeID")
+
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			return err
+		}
+		defer r.Body.Close()
+
+		var updateRoute ifaceservice.UpdateRoute
+		err = json.Unmarshal(body, &updateRoute)
+		if err != nil {
+			return err
+		}
+
+		route, err := h.service.UpdateRouteByID(ctx, routeID, updateRoute)
+		if err != nil {
+			return err
+		}
+
+		buffer, err := json.Marshal(route)
+		if err != nil {
+			return err
+		}
+
+		w.Write(buffer)
 		w.WriteHeader(http.StatusOK)
 		return nil
 	}

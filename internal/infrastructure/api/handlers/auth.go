@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
 	ifaceservice "github.com/jbakhtin/driving-school-route-coverage/internal/interfaces/services"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/utils/mailer"
 	"go.uber.org/zap"
@@ -38,7 +37,7 @@ func (h *AuthHandler) Register(ctx context.Context) http.HandlerFunc {
 
 		body, _ := io.ReadAll(r.Body)
 		defer r.Body.Close()
-		var request services.UserRegistrationRequest
+		var request ifaceservice.UserRegistrationRequest
 		err := json.Unmarshal(body, &request)
 		if err != nil {
 			return err
@@ -56,7 +55,7 @@ func (h *AuthHandler) Register(ctx context.Context) http.HandlerFunc {
 		}
 		mailsQueue <- *mail
 
-		registerResponseJSON, err := registerResponse.Marshal()
+		registerResponseJSON, err := json.Marshal(registerResponse)
 		if err != nil {
 			return err
 		}
@@ -77,7 +76,7 @@ func (h *AuthHandler) LogIn(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 
 		body, _ := io.ReadAll(r.Body)
-		var request services.UserLoginRequest
+		var request ifaceservice.UserLoginRequest
 		err := json.Unmarshal(body, &request)
 		if err != nil {
 			return err
@@ -88,7 +87,9 @@ func (h *AuthHandler) LogIn(ctx context.Context) http.HandlerFunc {
 			return err
 		}
 
-		w.Write(response.Marshal())
+		bytes, _ := json.Marshal(response)
+
+		w.Write(bytes)
 		w.WriteHeader(http.StatusOK)
 		return nil
 	}

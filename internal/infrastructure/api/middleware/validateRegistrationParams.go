@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
+	ifaceservice "github.com/jbakhtin/driving-school-route-coverage/internal/interfaces/services"
 	"io"
 	"net/http"
-
-	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
 )
 
 func ValidateRegistrationParams(next http.Handler) http.Handler {
@@ -19,7 +18,7 @@ func ValidateRegistrationParams(next http.Handler) http.Handler {
 		req.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
 		errsList := map[string]string{}
-		request := services.UserRegistrationRequest{}
+		request := ifaceservice.UserRegistrationRequest{}
 		_ = json.Unmarshal(bodyBytes, &request)
 
 		if request.Name == "" {
