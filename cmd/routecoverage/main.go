@@ -22,47 +22,47 @@ func main() {
 		log.Fatal(err)
 	}
 
-	logger, err := logger.New(*cfg)
+	lg, err := logger.New(*cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	closer, _ := closer.New(logger)
+	cl, _ := closer.New(lg)
 
 	var myServer *application.Server
 	if myServer, err = application.New(osCtx, *cfg); err != nil {
-		logger.Fatal(err.Error())
+		lg.Fatal(err.Error())
 	}
 
 	if err = myServer.Start(); err != nil {
-		logger.Fatal(err.Error())
+		lg.Fatal(err.Error())
 	}
 
 	mailsQueue, err := mailer.GetMailsQueue()
 	if err != nil {
-		logger.Fatal(err.Error())
+		lg.Fatal(err.Error())
 	}
-	mailSender, err := mailer.NewMailer(cfg, logger)
+	mailSender, err := mailer.NewMailer(cfg, lg)
 	if err != nil {
-		logger.Fatal(err.Error())
+		lg.Fatal(err.Error())
 	}
 
 	go func() {
 		if err = mailSender.Start(osCtx, mailsQueue); err != nil {
-			logger.Fatal(err.Error())
+			lg.Fatal(err.Error())
 		}
 	}()
 
-	closer.Add(myServer.Shutdown)
-	closer.Add(mailer.Shutdown)
+	cl.Add(myServer.Shutdown)
+	cl.Add(mailer.Shutdown)
 
 	// Gracefully shut down
 	<-osCtx.Done()
 	withTimeout, cancel := context.WithTimeout(context.Background(), time.Second * cfg.ShutdownTimeout)
 	defer cancel()
 
-	err = closer.Close(withTimeout)
+	err = cl.Close(withTimeout)
 	if err != nil {
-		logger.Error(err.Error())
+		lg.Error(err.Error())
 	}
 }

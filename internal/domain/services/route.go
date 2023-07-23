@@ -32,7 +32,10 @@ func NewRouteService(cfg config.Config, repo repositories.RouteRepository) (*Rou
 }
 
 func (us *RouteService) CreateRoute(ctx context.Context, routeCreationDto ifaceservice.RouteCreationDTO) (*models.Route, error) {
-	bytes, _ := json.Marshal(routeCreationDto.Line)
+	bytes, err := json.Marshal(routeCreationDto.Line)
+	if err != nil {
+		return nil, err
+	}
 
 	createUser := repositories.CreateRoute{
 		Name:       routeCreationDto.Name,
@@ -66,6 +69,7 @@ func (us *RouteService) UpdateRouteByID(ctx context.Context, routeID string, upd
 		Name: updateRoute.Name,
 		LineString: bytes,
 	}
+
 	route, err := us.repo.UpdateRouteByID(ctx, routeID, updateRouteData)
 	if err != nil {
 		return nil, err

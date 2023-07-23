@@ -75,7 +75,6 @@ func (us *AuthService) LoginUser(ctx context.Context, request ifaceservice.UserL
 		Password: request.Password,
 	}
 
-	// TODO: find user
 	user, err := us.repo.GetUserByLogin(ctx, userLogin.Login)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

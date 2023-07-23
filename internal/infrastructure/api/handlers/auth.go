@@ -35,10 +35,14 @@ func (h *AuthHandler) Register(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json")
 
-		body, _ := io.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			return err
+		}
 		defer r.Body.Close()
+
 		var request ifaceservice.UserRegistrationRequest
-		err := json.Unmarshal(body, &request)
+		err = json.Unmarshal(body, &request)
 		if err != nil {
 			return err
 		}
@@ -74,10 +78,14 @@ func (h *AuthHandler) Register(ctx context.Context) http.HandlerFunc {
 
 func (h *AuthHandler) LogIn(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			return err
+		}
+		defer r.Body.Close()
 
-		body, _ := io.ReadAll(r.Body)
 		var request ifaceservice.UserLoginRequest
-		err := json.Unmarshal(body, &request)
+		err = json.Unmarshal(body, &request)
 		if err != nil {
 			return err
 		}
@@ -87,9 +95,16 @@ func (h *AuthHandler) LogIn(ctx context.Context) http.HandlerFunc {
 			return err
 		}
 
-		bytes, _ := json.Marshal(response)
+		bytes, err := json.Marshal(response)
+		if err != nil {
+			return err
+		}
 
-		w.Write(bytes)
+		_, err = w.Write(bytes)
+		if err != nil {
+			return err
+		}
+
 		w.WriteHeader(http.StatusOK)
 		return nil
 	}

@@ -29,7 +29,6 @@ func (ur *UserRepository) CreateUser(ctx context.Context, user repositories.User
 			&stored.Password,
 			&stored.CreatedAt,
 			&stored.UpdatedAt)
-
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +47,6 @@ func (ur *UserRepository) GetUserByID(ctx context.Context, id int) (*models.User
 			&user.Password,
 			&user.CreatedAt,
 			&user.UpdatedAt)
-
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +65,6 @@ func (ur *UserRepository) GetUserByLogin(ctx context.Context, login string) (*mo
 			&user.Password,
 			&user.CreatedAt,
 			&user.UpdatedAt)
-
 	if err != nil {
 		return nil, err
 	}

@@ -17,7 +17,6 @@ type RouteHandler struct {
 }
 
 func NewRouteHandler(cfg config.Config, service ifaceservice.RouteService) (*RouteHandler, error) {
-
 	return &RouteHandler{
 		service: service,
 		config:  &cfg,
@@ -50,7 +49,11 @@ func (h *RouteHandler) Create(ctx context.Context) http.HandlerFunc {
 			return err
 		}
 
-		w.Write(buffer)
+		_, err = w.Write(buffer)
+		if err != nil {
+			return err
+		}
+
 		w.WriteHeader(http.StatusCreated)
 		return nil
 	}
@@ -84,7 +87,11 @@ func (h *RouteHandler) Show(ctx context.Context) http.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		w.Write(buffer)
+
+		_, err = w.Write(buffer)
+		if err != nil {
+			return err
+		}
 
 		w.WriteHeader(http.StatusOK)
 		return nil
@@ -121,7 +128,11 @@ func (h *RouteHandler) Update(ctx context.Context) http.HandlerFunc {
 			return err
 		}
 
-		w.Write(buffer)
+		_, err = w.Write(buffer)
+		if err != nil {
+			return err
+		}
+
 		w.WriteHeader(http.StatusOK)
 		return nil
 	}
