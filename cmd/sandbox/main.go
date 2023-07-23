@@ -26,7 +26,7 @@ func main() {
 
 	test, _ := wkb.Marshal(lineString, binary.LittleEndian)
 
-	routeCreation := repositories.RouteCreation{
+	routeCreation := repositories.CreateRoute{
 		LineString: test,
 	}
 
@@ -41,7 +41,7 @@ func main() {
 
 	json, _ := json.Marshal(route)
 
-	stringJson := string(json)
+	stringJSON := string(json)
 
-	fmt.Println(stringJson)
+	fmt.Println(stringJSON)
 }

@@ -81,6 +81,9 @@ func (h *RouteHandler) Show(ctx context.Context) http.HandlerFunc {
 		}
 
 		buffer, err := json.Marshal(route)
+		if err != nil {
+			return err
+		}
 		w.Write(buffer)
 
 		w.WriteHeader(http.StatusOK)

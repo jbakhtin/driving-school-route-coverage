@@ -34,7 +34,7 @@ func (ur *RouteRepository) CreateRoute(ctx context.Context, createRoute reposito
 
 func (ur *RouteRepository) GetRouteByID(ctx context.Context, routeID string) (*models.Route, error) {
 	var route models.Route
-	err := ur.QueryRowContext(ctx, query.GetRouteById, routeID).
+	err := ur.QueryRowContext(ctx, query.GetRouteByID, routeID).
 		Scan(&route.ID,
 			&route.LineString,
 			&route.CreatedAt,
@@ -50,7 +50,7 @@ func (ur *RouteRepository) GetRouteByID(ctx context.Context, routeID string) (*m
 func (ur *RouteRepository) UpdateRouteByID(ctx context.Context, routeID string, updateRoute repositories.UpdateRoute) (*models.Route, error) {
 	var route models.Route
 	fmt.Println(string(updateRoute.LineString))
-	err := ur.QueryRowContext(ctx, query.UpdateRouteById, &routeID, &updateRoute.LineString).
+	err := ur.QueryRowContext(ctx, query.UpdateRouteByID, &routeID, &updateRoute.LineString).
 		Scan(&route.ID,
 			&route.LineString,
 			&route.CreatedAt,

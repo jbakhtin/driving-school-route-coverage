@@ -7,12 +7,12 @@ import (
 
 type CreateRoute struct {
 	Name string
-	LineString []byte `json:"line,omitempty;type:geometry(LineString,4326)"`
+	LineString []byte `json:"line,omitempty" type:"geometry(LineString,4326)"`
 }
 
 type UpdateRoute struct {
-	Name string `json:"Name,omitempty;"`
-	LineString []byte `json:"line,omitempty;type:geometry(LineString,4326)"`
+	Name string `json:"Name,omitempty"`
+	LineString []byte `json:"line,omitempty" type:"geometry(LineString,4326)"`
 }
 
 type RouteRepository interface {
