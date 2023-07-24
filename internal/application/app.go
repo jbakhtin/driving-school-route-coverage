@@ -2,13 +2,14 @@ package application
 
 import (
 	"context"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/composites/api"
 	appMiddleware "github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/api/middleware"
-	"net/http"
 )
 
 type Server struct {
@@ -38,7 +39,6 @@ func New(ctx context.Context, cfg config.Config) (*Server, error) {
 	}
 	routeComposite.Register(ctx, r)
 
-
 	r.Group(func(r chi.Router) {
 		r.Use(appMiddleware.CheckAuth)
 
@@ -53,7 +53,7 @@ func New(ctx context.Context, cfg config.Config) (*Server, error) {
 	})
 
 	server := http.Server{
-		Addr: cfg.ServerAddress,
+		Addr:    cfg.ServerAddress,
 		Handler: r,
 	}
 

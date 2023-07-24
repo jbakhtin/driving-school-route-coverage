@@ -2,13 +2,15 @@ package query
 
 const (
 	CreateRoute = `
-		INSERT INTO routes (line, created_at)
-		VALUES(ST_AsGeoJSON($1), NOW())
-		RETURNING id, ST_AsBinary(line), created_at, updated_at
+		INSERT INTO routes (user_id, name, linestring, created_at)
+		VALUES($1, $2, ST_AsGeoJSON($3), NOW())
+		RETURNING id, user_id, name, ST_AsBinary(linestring), created_at, updated_at
 	`
 
 	GetRouteByID = `
-		SELECT Id, ST_AsBinary(line) AS line , created_at, updated_at FROM routes WHERE routes.id = $1
+		SELECT Id, ST_AsBinary(linestring) AS linestring , created_at, updated_at 
+		FROM routes 
+		WHERE routes.id = $1 AND routes.user_id = $2
 	`
 
 	GetRoutes = `
@@ -17,8 +19,8 @@ const (
 
 	UpdateRouteByID = `
 		UPDATE routes
-		SET line = ST_AsGeoJSON($2), updated_at = now()
-		WHERE id = $1
-		RETURNING id, ST_AsBinary(line), created_at, updated_at
+		SET name = $3, linestring = ST_AsGeoJSON($4), updated_at = now()
+		WHERE id = $1 AND  user_id = $2
+		RETURNING id, user_id, name, ST_AsBinary(linestring), created_at, updated_at
 	`
 )

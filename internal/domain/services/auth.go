@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
@@ -47,7 +48,7 @@ func (us *AuthService) RegisterUser(ctx context.Context, request ifaceservice.Us
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		return nil, err
 	}
-	if user != nil  {
+	if user != nil {
 		return nil, apperror.UserAlreadyExists
 	}
 
@@ -95,6 +96,8 @@ func (us *AuthService) LoginUser(ctx context.Context, request ifaceservice.UserL
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
 	claims["user_id"] = user.ID
+	token.Claims = claims
+
 	tokenString, err := token.SignedString([]byte(us.config.AppKey))
 	if err != nil {
 		return nil, err

@@ -50,9 +50,9 @@ func TestAuthHandler_LogIn(t *testing.T) {
 	}
 
 	type want struct {
-		StatusCode int
+		StatusCode  int
 		ContentType string
-		Body map[string]any
+		Body        map[string]any
 	}
 	var tests = []struct {
 		name string
@@ -63,7 +63,7 @@ func TestAuthHandler_LogIn(t *testing.T) {
 			"User Success Authorized",
 			args{
 				map[string]string{
-					"login": "test_login",
+					"login":    "test_login",
 					"password": "test_password",
 				},
 			},
@@ -79,7 +79,7 @@ func TestAuthHandler_LogIn(t *testing.T) {
 			"User Not Found",
 			args{
 				map[string]string{
-					"login": "test",
+					"login":    "test",
 					"password": "test",
 				},
 			},
@@ -88,7 +88,7 @@ func TestAuthHandler_LogIn(t *testing.T) {
 				"application/json",
 				map[string]any{
 					"message": "User doesn't exist with this login",
-					"code": "001",
+					"code":    "001",
 				},
 			},
 		},
@@ -104,7 +104,7 @@ func TestAuthHandler_LogIn(t *testing.T) {
 				"application/json",
 				map[string]any{
 					"message": "Bad request params",
-					"code": "004",
+					"code":    "004",
 					"errors": map[string]string{
 						"password": "Password parameter is required",
 					},
@@ -123,7 +123,7 @@ func TestAuthHandler_LogIn(t *testing.T) {
 				"application/json",
 				map[string]any{
 					"message": "Bad request params",
-					"code": "004",
+					"code":    "004",
 					"errors": map[string]string{
 						"login": "Login parameter is required",
 					},
@@ -132,16 +132,15 @@ func TestAuthHandler_LogIn(t *testing.T) {
 		},
 		{
 			"Parameters not passed",
-			args{
-			},
+			args{},
 			want{
 				400,
 				"application/json",
 				map[string]any{
 					"message": "Bad request params",
-					"code": "004",
+					"code":    "004",
 					"errors": map[string]string{
-						"login": "Login parameter is required",
+						"login":    "Login parameter is required",
 						"password": "Password parameter is required",
 					},
 				},
@@ -227,9 +226,9 @@ func TestAuthHandler_Register(t *testing.T) {
 	}
 
 	type want struct {
-		StatusCode int
+		StatusCode  int
 		ContentType string
-		Body map[string]any
+		Body        map[string]any
 	}
 
 	h := &AuthHandler{
@@ -239,19 +238,19 @@ func TestAuthHandler_Register(t *testing.T) {
 	}
 
 	tests := []struct {
-		name    string
-		args    args
+		name string
+		args args
 		want want
 	}{
 		{
 			"User successful registered",
 			args{
 				map[string]string{
-					"lastname": "Бахтин",
-					"name": "Юрий",
-					"email": "test_user@yandex.ru",
-					"login": "test_user",
-					"password": "zetati16",
+					"lastname":              "Бахтин",
+					"name":                  "Юрий",
+					"email":                 "test_user@yandex.ru",
+					"login":                 "test_user",
+					"password":              "zetati16",
 					"password_confirmation": "zetati16",
 				},
 			},
@@ -267,10 +266,10 @@ func TestAuthHandler_Register(t *testing.T) {
 			"Parameters not passed",
 			args{
 				map[string]string{
-					"lastname": "Бахтин",
-					"name": "Юрий",
-					"email": "leperiton11@yandex.ru",
-					"password": "zetati16",
+					"lastname":              "Бахтин",
+					"name":                  "Юрий",
+					"email":                 "leperiton11@yandex.ru",
+					"password":              "zetati16",
 					"password_confirmation": "zetati16",
 				},
 			},
@@ -279,7 +278,7 @@ func TestAuthHandler_Register(t *testing.T) {
 				"application/json",
 				map[string]any{
 					"message": "Bad request params",
-					"code": "003",
+					"code":    "003",
 					"errors": map[string]string{
 						"login": "Login parameter is required",
 					},

@@ -3,6 +3,8 @@ package services
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/models"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
@@ -11,7 +13,7 @@ import (
 )
 
 type RouteCreationDTO struct {
-	Name string `json:"name" validate:"required"`
+	Name string            `json:"name" validate:"required"`
 	Line *geojson.Geometry `json:"geometry" validate:"required,linestring"`
 }
 
@@ -37,8 +39,13 @@ func (us *RouteService) CreateRoute(ctx context.Context, routeCreationDto ifaces
 		return nil, err
 	}
 
+	userID := ctx.Value("user_id")
+
+	fmt.Println(userID)
+
 	createUser := repositories.CreateRoute{
 		Name:       routeCreationDto.Name,
+		UserID: userID.(float64),
 		LineString: bytes,
 	}
 
@@ -66,7 +73,7 @@ func (us *RouteService) UpdateRouteByID(ctx context.Context, routeID string, upd
 	}
 
 	updateRouteData := repositories.UpdateRoute{
-		Name: updateRoute.Name,
+		Name:       updateRoute.Name,
 		LineString: bytes,
 	}
 

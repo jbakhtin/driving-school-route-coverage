@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
@@ -46,11 +47,11 @@ func (c *RouteComposite) Register(ctx context.Context, router chi.Router) {
 		r.Use(appMiddleware.CheckAuth)
 
 		r.Get("/", c.handler.Get(ctx))
-		r.Post("/", c.handler.Create(ctx))
+		r.With(appMiddleware.ValidateCreateRouteParams).Post("/", c.handler.Create(ctx))
 
 		r.Route("/{routeID}", func(r chi.Router) {
 			r.Get("/", c.handler.Show(ctx))
-			r.Put("/", c.handler.Update(ctx))
+			r.With(appMiddleware.ValidateUpdateRouteParams).Put("/", c.handler.Update(ctx))
 			r.Delete("/", c.handler.Delete(ctx))
 		})
 	})

@@ -2,17 +2,19 @@ package repositories
 
 import (
 	"context"
+
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/models"
 )
 
 type CreateRoute struct {
-	Name string
-	LineString []byte `json:"line,omitempty" type:"geometry(LineString,4326)"`
+	Name       string `json:"name,omitempty"`
+	UserID     float64  `json:"user_id,omitempty"`
+	LineString []byte `json:"linestring,omitempty" type:"geometry(LineString,4326)"`
 }
 
 type UpdateRoute struct {
-	Name string `json:"Name,omitempty"`
-	LineString []byte `json:"line,omitempty" type:"geometry(LineString,4326)"`
+	Name       string `json:"name,omitempty"`
+	LineString []byte `json:"linestring,omitempty" type:"geometry(LineString,4326)"`
 }
 
 type RouteRepository interface {

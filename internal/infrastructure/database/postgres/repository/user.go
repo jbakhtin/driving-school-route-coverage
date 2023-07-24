@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/models"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/infrastructure/database/postgres"

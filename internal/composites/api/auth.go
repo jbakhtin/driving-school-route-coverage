@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"

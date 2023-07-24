@@ -3,18 +3,19 @@ package closer
 import (
 	"context"
 	"fmt"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/application/logger"
 	"strings"
 	"sync"
+
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application/logger"
 )
 
 type Closer struct {
-	mu    sync.Mutex
-	funcs []Func
+	mu     sync.Mutex
+	funcs  []Func
 	logger *logger.Logger
 }
 
-func New(logger *logger.Logger) (Closer, error){
+func New(logger *logger.Logger) (Closer, error) {
 	return Closer{
 		logger: logger,
 	}, nil

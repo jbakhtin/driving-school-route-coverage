@@ -12,9 +12,9 @@ import (
 )
 
 type Mail struct {
-	To string
+	To      string
 	Subject string
-	Body string
+	Body    string
 }
 
 func NewMail(to, subject, body string) *Mail {

@@ -2,13 +2,14 @@ package logger
 
 import (
 	"fmt"
+	"io"
+	"os"
+	"time"
+
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
-	"io"
-	"os"
-	"time"
 )
 
 type Logger struct {
@@ -29,7 +30,7 @@ func New(cfg config.Config) (*Logger, error) {
 		time := time.Now()
 
 		dir1 := fmt.Sprintf("%vinfo/", cfg.Log.Directory)
-		err := os.MkdirAll(dir1,0777)
+		err := os.MkdirAll(dir1, 0777)
 		if err != nil {
 			return nil, err
 		}
@@ -42,7 +43,6 @@ func New(cfg config.Config) (*Logger, error) {
 			Compress:   cfg.Log.Compress,
 		})
 
-
 		tops = append(tops, teeOption{
 			W: w,
 			Lef: func(lvl zapcore.Level) bool {
@@ -51,7 +51,7 @@ func New(cfg config.Config) (*Logger, error) {
 		})
 
 		dir2 := fmt.Sprintf("%verror/", cfg.Log.Directory)
-		err = os.MkdirAll(dir2,0777)
+		err = os.MkdirAll(dir2, 0777)
 		if err != nil {
 			return nil, err
 		}

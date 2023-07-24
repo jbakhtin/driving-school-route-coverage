@@ -3,13 +3,14 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"io"
+	"net/http"
+
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	ifaceservice "github.com/jbakhtin/driving-school-route-coverage/internal/interfaces/services"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/utils/mailer"
 	"go.uber.org/zap"
-	"io"
-	"net/http"
 )
 
 type AuthHandler struct {

@@ -26,7 +26,6 @@ type UserRegistrationResponse struct {
 	Message string `json:"message,omitempty"`
 }
 
-
 type AuthService interface {
 	RegisterUser(ctx context.Context, request UserRegistrationRequest) (*UserRegistrationResponse, error)
 	LoginUser(ctx context.Context, request UserLoginRequest) (*UserLoginResponse, error)

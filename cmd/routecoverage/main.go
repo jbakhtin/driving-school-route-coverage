@@ -2,15 +2,16 @@ package main
 
 import (
 	"context"
+	"log"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/logger"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/utils/mailer"
 	"github.com/jbakhtin/driving-school-route-coverage/pkg/closer"
-	"log"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 func main() {
@@ -58,7 +59,7 @@ func main() {
 
 	// Gracefully shut down
 	<-osCtx.Done()
-	withTimeout, cancel := context.WithTimeout(context.Background(), time.Second * cfg.ShutdownTimeout)
+	withTimeout, cancel := context.WithTimeout(context.Background(), time.Second*cfg.ShutdownTimeout)
 	defer cancel()
 
 	err = cl.Close(withTimeout)

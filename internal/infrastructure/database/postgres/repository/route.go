@@ -21,9 +21,11 @@ func NewRouteRepository(client *postgres.Postgres) (*RouteRepository, error) {
 func (ur *RouteRepository) CreateRoute(ctx context.Context, createRoute repositories.CreateRoute) (*models.Route, error) {
 	var stored models.Route
 
-	err := ur.QueryRowContext(ctx, query.CreateRoute, &createRoute.LineString).
+	err := ur.QueryRowContext(ctx, query.CreateRoute, &createRoute.UserID, &createRoute.Name, &createRoute.LineString).
 		Scan(
 			&stored.ID,
+			&stored.UserID,
+			&stored.Name,
 			&stored.LineString,
 			&stored.CreatedAt,
 			&stored.UpdatedAt)
@@ -36,7 +38,9 @@ func (ur *RouteRepository) CreateRoute(ctx context.Context, createRoute reposito
 
 func (ur *RouteRepository) GetRouteByID(ctx context.Context, routeID string) (*models.Route, error) {
 	var route models.Route
-	err := ur.QueryRowContext(ctx, query.GetRouteByID, routeID).
+
+	userID := ctx.Value("user_id")
+	err := ur.QueryRowContext(ctx, query.GetRouteByID, routeID, userID).
 		Scan(&route.ID,
 			&route.LineString,
 			&route.CreatedAt,
@@ -50,8 +54,12 @@ func (ur *RouteRepository) GetRouteByID(ctx context.Context, routeID string) (*m
 
 func (ur *RouteRepository) UpdateRouteByID(ctx context.Context, routeID string, updateRoute repositories.UpdateRoute) (*models.Route, error) {
 	var route models.Route
-	err := ur.QueryRowContext(ctx, query.UpdateRouteByID, &routeID, &updateRoute.LineString).
+
+	userID := ctx.Value("user_id")
+	err := ur.QueryRowContext(ctx, query.UpdateRouteByID, &routeID, userID, updateRoute.Name, &updateRoute.LineString).
 		Scan(&route.ID,
+			&route.UserID,
+			&route.Name,
 			&route.LineString,
 			&route.CreatedAt,
 			&route.UpdatedAt)

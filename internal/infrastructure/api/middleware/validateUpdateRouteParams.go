@@ -3,16 +3,14 @@ package middleware
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
-	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/services"
+	ifaceservice "github.com/jbakhtin/driving-school-route-coverage/internal/interfaces/services"
 	"io"
 	"net/http"
-	"regexp"
 )
 
-func ValidateRouteCreationParams(next http.Handler) http.Handler {
+func ValidateUpdateRouteParams(next http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		validate := validator.New()
 		err := validate.RegisterValidation("linestring", LineString)
@@ -28,7 +26,7 @@ func ValidateRouteCreationParams(next http.Handler) http.Handler {
 
 		errsList := map[string]string{}
 
-		request := services.RouteCreationDTO{}
+		request := ifaceservice.UpdateRoute{}
 		err = json.Unmarshal(bodyBytes, &request)
 		if err != nil {
 			return err
@@ -53,21 +51,3 @@ func ValidateRouteCreationParams(next http.Handler) http.Handler {
 
 	return apperror.Handler(fn)
 }
-
-func LineString(fl validator.FieldLevel) bool {
-	coordinates := fl.Field().Interface().([][]float64)
-	// Проверяем, что в LineString есть хотя бы две точки
-	if len(coordinates) < 2 {
-		return false
-	}
-
-	// Проверяем формат каждой координаты (широта, долгота)
-	coordRegex := regexp.MustCompile(`^-?\d+(\.\d+)?,-?\d+(\.\d+)?$`)
-	for _, c := range coordinates {
-		if !coordRegex.MatchString(fmt.Sprintf("%f,%f", c[0], c[1])) {
-			return false
-		}
-	}
-	return true
-}
-

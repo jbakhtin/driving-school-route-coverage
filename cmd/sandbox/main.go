@@ -23,7 +23,6 @@ func main() {
 		[]float64{1.0, 2.0},
 	})
 
-
 	test, _ := wkb.Marshal(lineString, binary.LittleEndian)
 
 	routeCreation := repositories.CreateRoute{

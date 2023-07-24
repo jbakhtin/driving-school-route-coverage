@@ -3,12 +3,13 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"io"
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	ifaceservice "github.com/jbakhtin/driving-school-route-coverage/internal/interfaces/services"
-	"io"
-	"net/http"
 )
 
 type RouteHandler struct {
@@ -26,6 +27,7 @@ func NewRouteHandler(cfg config.Config, service ifaceservice.RouteService) (*Rou
 func (h *RouteHandler) Create(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json")
+		ctx = context.WithValue(ctx, "user_id", r.Context().Value("user_id"))
 
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
@@ -75,6 +77,7 @@ func (h *RouteHandler) Get(ctx context.Context) http.HandlerFunc {
 func (h *RouteHandler) Show(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json")
+		ctx = context.WithValue(ctx, "user_id", r.Context().Value("user_id"))
 
 		routeID := chi.URLParam(r, "routeID")
 
@@ -103,6 +106,7 @@ func (h *RouteHandler) Show(ctx context.Context) http.HandlerFunc {
 func (h *RouteHandler) Update(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json")
+		ctx = context.WithValue(ctx, "user_id", r.Context().Value("user_id"))
 
 		routeID := chi.URLParam(r, "routeID")
 

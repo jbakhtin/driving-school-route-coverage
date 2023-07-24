@@ -7,12 +7,12 @@ import (
 )
 
 type RouteCreationDTO struct {
-	Name string `json:"name" validate:"required"`
+	Name string            `json:"name" validate:"required"`
 	Line *geojson.Geometry `json:"geometry" validate:"required,linestring"`
 }
 
 type UpdateRoute struct {
-	Name string
+	Name     string
 	Geometry *geojson.Geometry `json:"geometry" validate:"required,linestring"`
 }
 
