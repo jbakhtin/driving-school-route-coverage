@@ -69,3 +69,13 @@ func (ur *RouteRepository) UpdateRouteByID(ctx context.Context, routeID string, 
 
 	return &route, nil
 }
+
+func (ur *RouteRepository) DeleteRouteByID(ctx context.Context, routeID string) error {
+	userID := ctx.Value("user_id")
+	err := ur.QueryRowContext(ctx, query.DeleteRouteByID, &routeID, userID).Err()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -21,4 +21,5 @@ type RouteRepository interface {
 	CreateRoute(ctx context.Context, createRoute CreateRoute) (*models.Route, error)
 	GetRouteByID(ctx context.Context, routeID string) (*models.Route, error)
 	UpdateRouteByID(ctx context.Context, routeID string, updateRoute UpdateRoute) (*models.Route, error)
+	DeleteRouteByID(ctx context.Context, routeID string) error
 }

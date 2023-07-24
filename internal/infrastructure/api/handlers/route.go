@@ -148,6 +148,15 @@ func (h *RouteHandler) Delete(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json")
 
+		ctx = context.WithValue(ctx, "user_id", r.Context().Value("user_id"))
+
+		routeID := chi.URLParam(r, "routeID")
+
+		err := h.service.DeleteRouteByID(ctx, routeID)
+		if err != nil {
+			return err
+		}
+
 		w.WriteHeader(http.StatusOK)
 		return nil
 	}

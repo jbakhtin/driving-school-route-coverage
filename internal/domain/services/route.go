@@ -3,8 +3,6 @@ package services
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/models"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
@@ -40,8 +38,6 @@ func (us *RouteService) CreateRoute(ctx context.Context, routeCreationDto ifaces
 	}
 
 	userID := ctx.Value("user_id")
-
-	fmt.Println(userID)
 
 	createUser := repositories.CreateRoute{
 		Name:       routeCreationDto.Name,
@@ -83,4 +79,13 @@ func (us *RouteService) UpdateRouteByID(ctx context.Context, routeID string, upd
 	}
 
 	return route, nil
+}
+
+func (us *RouteService) DeleteRouteByID(ctx context.Context, routeID string) error {
+	err := us.repo.DeleteRouteByID(ctx, routeID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

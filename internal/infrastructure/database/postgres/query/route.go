@@ -20,7 +20,12 @@ const (
 	UpdateRouteByID = `
 		UPDATE routes
 		SET name = $3, linestring = ST_AsGeoJSON($4), updated_at = now()
-		WHERE id = $1 AND  user_id = $2
+		WHERE id = $1 AND user_id = $2
 		RETURNING id, user_id, name, ST_AsBinary(linestring), created_at, updated_at
+	`
+
+	DeleteRouteByID = `
+		DELETE FROM routes
+		WHERE id = $1 AND user_id = $2
 	`
 )

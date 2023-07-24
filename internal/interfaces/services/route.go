@@ -20,4 +20,5 @@ type RouteService interface {
 	CreateRoute(ctx context.Context, routeCreationDTO RouteCreationDTO) (*models.Route, error)
 	GetRouteByID(ctx context.Context, routeID string) (*models.Route, error)
 	UpdateRouteByID(ctx context.Context, routeID string, updateRoute UpdateRoute) (*models.Route, error)
+	DeleteRouteByID(ctx context.Context, routeID string) error
 }
