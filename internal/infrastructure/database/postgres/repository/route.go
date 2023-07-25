@@ -97,6 +97,11 @@ func (ur *RouteRepository) GetRoutes(ctx context.Context) (*[]models.Route, erro
 		return nil, err
 	}
 
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+
 	for rows.Next() {
 		var route models.Route
 
