@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/apperror"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application/types"
 	"log"
 	"net/http"
 
@@ -44,7 +45,7 @@ func CheckAuth(next http.Handler) http.Handler {
 			log.Fatal("Invalid user_id format")
 		}
 
-		requestCtx := context.WithValue(r.Context(), "user_id", userID)
+		requestCtx := context.WithValue(r.Context(), types.ContextKeyUserID, userID)
 		r = r.WithContext(requestCtx)
 
 		next.ServeHTTP(w, r)
