@@ -3,7 +3,9 @@ package services
 import (
 	"context"
 	"encoding/json"
+
 	"github.com/jbakhtin/driving-school-route-coverage/internal/application/config"
+	"github.com/jbakhtin/driving-school-route-coverage/internal/application/types"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/models"
 	"github.com/jbakhtin/driving-school-route-coverage/internal/domain/repositories"
 	ifaceservice "github.com/jbakhtin/driving-school-route-coverage/internal/interfaces/services"
@@ -11,8 +13,9 @@ import (
 )
 
 type RouteCreationDTO struct {
-	Name string            `json:"name" validate:"required"`
-	Line *geojson.Geometry `json:"geometry" validate:"required,linestring"`
+	Name        string            `json:"name" validate:"required"`
+	Description *string           `json:"description" validate:"required"`
+	Line        *geojson.Geometry `json:"geometry" validate:"required,linestring"`
 }
 
 type RouteCreatedDTO struct {
@@ -37,12 +40,13 @@ func (us *RouteService) CreateRoute(ctx context.Context, routeCreationDto ifaces
 		return nil, err
 	}
 
-	userID := ctx.Value("user_id")
+	userID := ctx.Value(types.ContextKeyUserID)
 
 	createUser := repositories.CreateRoute{
-		Name:       routeCreationDto.Name,
-		UserID: userID.(float64),
-		LineString: bytes,
+		Name:        routeCreationDto.Name,
+		Description: routeCreationDto.Description,
+		UserID:      userID.(float64),
+		LineString:  bytes,
 	}
 
 	route, err := us.repo.CreateRoute(ctx, createUser)
@@ -88,4 +92,13 @@ func (us *RouteService) DeleteRouteByID(ctx context.Context, routeID string) err
 	}
 
 	return nil
+}
+
+func (us *RouteService) GetRoutes(ctx context.Context) (*[]models.Route, error) {
+	routes, err := us.repo.GetRoutes(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return routes, nil
 }

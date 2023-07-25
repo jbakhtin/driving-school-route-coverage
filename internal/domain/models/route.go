@@ -15,10 +15,11 @@ func (ls Geometry) MarshalJSON() ([]byte, error) {
 }
 
 type Route struct {
-	ID         int64    `json:"id,omitempty"`
-	UserID     int64    `json:"user_id,omitempty"`
-	Name       string   `json:"name,omitempty"`
-	LineString Geometry `json:"line_string,omitempty"`
-	CreatedAt  string   `json:"created_at,omitempty"`
-	UpdatedAt  *string  `json:"updated_at,omitempty"`
+	ID          int64    `json:"id,omitempty"`
+	UserID      int64    `json:"user_id,omitempty"`
+	Name        string   `json:"name,omitempty"`
+	Description *string   `json:"description,omitempty"`
+	LineString  Geometry `json:"line_string,omitempty"`
+	CreatedAt   string   `json:"created_at,omitempty"`
+	UpdatedAt   *string  `json:"updated_at,omitempty"`
 }

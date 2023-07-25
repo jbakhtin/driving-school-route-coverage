@@ -28,7 +28,7 @@ func NewRouteHandler(cfg config.Config, service ifaceservice.RouteService) (*Rou
 func (h *RouteHandler) Create(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json")
-		ctx = context.WithValue(ctx, types.ContextKeyUserID, r.Context().Value("user_id"))
+		ctx = context.WithValue(ctx, types.ContextKeyUserID, r.Context().Value(types.ContextKeyUserID))
 
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
@@ -67,6 +67,22 @@ func (h *RouteHandler) Create(ctx context.Context) http.HandlerFunc {
 func (h *RouteHandler) Get(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json")
+		ctx = context.WithValue(ctx, types.ContextKeyUserID, r.Context().Value(types.ContextKeyUserID))
+
+		routes, err := h.service.GetRoutes(ctx)
+		if err != nil {
+			return err
+		}
+
+		buffer, err := json.Marshal(routes)
+		if err != nil {
+			return err
+		}
+
+		_, err = w.Write(buffer)
+		if err != nil {
+			return err
+		}
 
 		w.WriteHeader(http.StatusOK)
 		return nil
@@ -78,7 +94,7 @@ func (h *RouteHandler) Get(ctx context.Context) http.HandlerFunc {
 func (h *RouteHandler) Show(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json")
-		ctx = context.WithValue(ctx, types.ContextKeyUserID, r.Context().Value("user_id"))
+		ctx = context.WithValue(ctx, types.ContextKeyUserID, r.Context().Value(types.ContextKeyUserID))
 
 		routeID := chi.URLParam(r, "routeID")
 
@@ -107,7 +123,7 @@ func (h *RouteHandler) Show(ctx context.Context) http.HandlerFunc {
 func (h *RouteHandler) Update(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json")
-		ctx = context.WithValue(ctx, types.ContextKeyUserID, r.Context().Value("user_id"))
+		ctx = context.WithValue(ctx, types.ContextKeyUserID, r.Context().Value(types.ContextKeyUserID))
 
 		routeID := chi.URLParam(r, "routeID")
 
@@ -148,7 +164,7 @@ func (h *RouteHandler) Update(ctx context.Context) http.HandlerFunc {
 func (h *RouteHandler) Delete(ctx context.Context) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) error {
 		w.Header().Set("Content-Type", "application/json")
-		ctx = context.WithValue(ctx, types.ContextKeyUserID, r.Context().Value("user_id"))
+		ctx = context.WithValue(ctx, types.ContextKeyUserID, r.Context().Value(types.ContextKeyUserID))
 
 		routeID := chi.URLParam(r, "routeID")
 
